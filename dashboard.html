@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WalkIn. — Nick's Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #2e2e2e;
+    --accent: #7c3aed;
+    --accent-dim: rgba(124,58,237,0.15);
+    --text: #f0f0f0;
+    --muted: #888;
+    --due: #f59e0b;
+    --due-bg: rgba(245,158,11,0.12);
+    --reminded: #3b82f6;
+    --reminded-bg: rgba(59,130,246,0.12);
+    --notdue: #10b981;
+    --notdue-bg: rgba(16,185,129,0.12);
+    --optout: #6b7280;
+    --optout-bg: rgba(107,114,128,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+  }
+  header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  .logo {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent); }
+  .subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .refresh-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s;
+  }
+  .refresh-btn:hover { border-color: var(--accent); }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat {
+    background: var(--bg);
+    padding: 20px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stat-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .filters {
+    padding: 16px 28px;
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover { color: var(--text); border-color: #555; }
+  .filter-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--text); }
+
+  .search-bar {
+    padding: 0 28px 16px;
+  }
+  .search-bar input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-bar input:focus { border-color: var(--accent); }
+  .search-bar input::placeholder { color: var(--muted); }
+
+  .table-wrap { padding: 0 28px 40px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  tbody tr:hover { background: var(--surface); }
+  tbody td {
+    padding: 14px 12px;
+    font-size: 14px;
+  }
+  .name-cell { font-weight: 500; }
+  .phone-cell { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); }
+  .freq-cell { font-family: 'DM Mono', monospace; font-size: 13px; }
+  .date-cell { font-size: 13px; color: var(--muted); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .badge-due { background: var(--due-bg); color: var(--due); }
+  .badge-due::before { background: var(--due); }
+  .badge-reminded { background: var(--reminded-bg); color: var(--reminded); }
+  .badge-reminded::before { background: var(--reminded); }
+  .badge-not_due { background: var(--notdue-bg); color: var(--notdue); }
+  .badge-not_due::before { background: var(--notdue); }
+  .badge-opted_out { background: var(--optout-bg); color: var(--optout); }
+  .badge-opted_out::before { background: var(--optout); }
+
+  .loading {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .dot-pulse { display: inline-block; animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+  .empty {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  @media (max-width: 640px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    header, .filters, .search-bar, .table-wrap { padding-left: 16px; padding-right: 16px; }
+    .stat { padding: 16px; }
+    .stat-num { font-size: 22px; }
+    thead th:nth-child(3), tbody td:nth-child(3) { display: none; }
+    thead th:nth-child(5), tbody td:nth-child(5) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">WalkIn<span>.</span></div>
+    <div class="subtitle">Nick Cuts — Customer Dashboard</div>
+  </div>
+  <button class="refresh-btn" onclick="loadCustomers()">↻ Refresh</button>
+</header>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num" id="stat-total">—</div>
+    <div class="stat-label">Total customers</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" style="color:var(--due)" id="stat-due">—</div>
+    <div class="stat-label">Due for a cut</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" style="color:var(--reminded)" id="stat-reminded">—</div>
+    <div class="stat-label">Reminded</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" style="color:var(--optout)" id="stat-optout">—</div>
+    <div class="stat-label">Opted out</div>
+  </div>
+</div>
+
+<div class="filters" id="filters">
+  <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+  <button class="filter-btn" onclick="setFilter('due', this)">Due</button>
+  <button class="filter-btn" onclick="setFilter('reminded', this)">Reminded</button>
+  <button class="filter-btn" onclick="setFilter('not_due', this)">Not due</button>
+  <button class="filter-btn" onclick="setFilter('opted_out', this)">Opted out</button>
+</div>
+
+<div class="search-bar">
+  <input type="text" id="search" placeholder="Search by name or phone..." oninput="renderTable()">
+</div>
+
+<div class="table-wrap">
+  <div class="loading" id="loading"><span class="dot-pulse">Loading customers…</span></div>
+  <table id="table" style="display:none">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Frequency</th>
+        <th>Last visit</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div class="empty" id="empty" style="display:none">No customers match this filter.</div>
+</div>
+
+<script>
+  const XANO = 'https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm';
+  let allCustomers = [];
+  let currentFilter = 'all';
+
+  async function loadCustomers() {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('table').style.display = 'none';
+    document.getElementById('empty').style.display = 'none';
+    try {
+      const res = await fetch(XANO + '/customer/all');
+      allCustomers = await res.json();
+      updateStats();
+      renderTable();
+    } catch(e) {
+      document.getElementById('loading').innerHTML = 'Failed to load. Check your connection.';
+    }
+  }
+
+  function updateStats() {
+    document.getElementById('stat-total').textContent = allCustomers.length;
+    document.getElementById('stat-due').textContent = allCustomers.filter(c => c.reminder_state === 'due' && !c.opted_out).length;
+    document.getElementById('stat-reminded').textContent = allCustomers.filter(c => c.reminder_state === 'reminded').length;
+    document.getElementById('stat-optout').textContent = allCustomers.filter(c => c.opted_out).length;
+  }
+
+  function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTable();
+  }
+
+  function renderTable() {
+    const search = document.getElementById('search').value.toLowerCase();
+    let rows = allCustomers.filter(c => {
+      const matchFilter = currentFilter === 'all'
+        ? true
+        : currentFilter === 'opted_out'
+          ? c.opted_out
+          : c.reminder_state === currentFilter && !c.opted_out;
+      const matchSearch = !search ||
+        (c.first_name || '').toLowerCase().includes(search) ||
+        (c.phone || '').toString().includes(search);
+      return matchFilter && matchSearch;
+    });
+
+    const tbody = document.getElementById('tbody');
+    document.getElementById('loading').style.display = 'none';
+
+    if (rows.length === 0) {
+      document.getElementById('table').style.display = 'none';
+      document.getElementById('empty').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('empty').style.display = 'none';
+    document.getElementById('table').style.display = 'table';
+
+    tbody.innerHTML = rows.map(c => {
+      const status = c.opted_out ? 'opted_out' : (c.reminder_state || 'not_due');
+      const label = status === 'opted_out' ? 'Opted out'
+        : status === 'due' ? 'Due'
+        : status === 'reminded' ? 'Reminded'
+        : 'Not due';
+      const lastVisit = c.last_visit_at
+        ? new Date(c.last_visit_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})
+        : '—';
+      const freq = c.haircut_frequency_weeks ? `Every ${c.haircut_frequency_weeks}w` : '—';
+      return `<tr>
+        <td class="name-cell">${c.first_name || '—'}</td>
+        <td class="phone-cell">${c.phone || '—'}</td>
+        <td class="freq-cell">${freq}</td>
+        <td class="date-cell">${lastVisit}</td>
+        <td><span class="badge badge-${status}">${label}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  loadCustomers();
+</script>
+</body>
+</html>
