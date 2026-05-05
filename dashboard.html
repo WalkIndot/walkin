@@ -3,339 +3,679 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WalkIn. — Nick's Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>WalkIn. Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0f0f0f;
     --surface: #1a1a1a;
-    --surface2: #242424;
+    --surface2: #222222;
     --border: #2e2e2e;
-    --accent: #7c3aed;
-    --accent-dim: rgba(124,58,237,0.15);
-    --text: #f0f0f0;
+    --text: #f0ede8;
     --muted: #888;
-    --due: #f59e0b;
-    --due-bg: rgba(245,158,11,0.12);
-    --reminded: #3b82f6;
-    --reminded-bg: rgba(59,130,246,0.12);
-    --notdue: #10b981;
-    --notdue-bg: rgba(16,185,129,0.12);
-    --optout: #6b7280;
-    --optout-bg: rgba(107,114,128,0.12);
+    --accent: #c8f060;
+    --accent-dim: #a0c040;
+    --red: #ff5c5c;
+    --orange: #ff9a3c;
+    --yellow: #ffd460;
+    --blue: #60b8f0;
+    --green: #60e090;
+    --grey: #666;
   }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
     min-height: 100vh;
   }
-  header {
-    padding: 24px 28px 20px;
-    border-bottom: 1px solid var(--border);
+
+  /* ── LOGIN ── */
+  #login-screen {
+    min-height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
+    justify-content: center;
     background: var(--bg);
-    z-index: 10;
   }
-  .logo {
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    font-size: 20px;
-    letter-spacing: -0.5px;
-  }
-  .logo span { color: var(--accent); }
-  .subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
-  .refresh-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    transition: border-color 0.2s;
-  }
-  .refresh-btn:hover { border-color: var(--accent); }
 
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border-bottom: 1px solid var(--border);
+  .login-box {
+    width: 360px;
+    padding: 48px 40px;
+    border: 1px solid var(--border);
+    background: var(--surface);
   }
-  
-  .stat {
-    background: var(--bg);
-    padding: 20px 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .stat-num {
-    font-family: 'DM Mono', monospace;
+
+  .login-wordmark {
+    font-family: 'Syne', sans-serif;
     font-size: 28px;
-    font-weight: 500;
-    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--accent);
+    margin-bottom: 8px;
   }
-  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
-  .filters {
-    padding: 16px 28px;
-    display: flex;
-    gap: 8px;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-  .filter-btn {
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: transparent;
+  .login-sub {
     color: var(--muted);
-    font-size: 13px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.15s;
+    font-size: 12px;
+    margin-bottom: 36px;
   }
-  .filter-btn:hover { color: var(--text); border-color: #555; }
-  .filter-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--text); }
 
-  .search-bar {
-    padding: 0 28px 16px;
+  .login-box label {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
   }
-  .search-bar input {
+
+  .login-box input {
     width: 100%;
-    background: var(--surface);
+    background: var(--bg);
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 10px 12px;
+    margin-bottom: 20px;
     outline: none;
     transition: border-color 0.2s;
   }
-  .search-bar input:focus { border-color: var(--accent); }
-  .search-bar input::placeholder { color: var(--muted); }
 
-  .table-wrap { padding: 0 28px 40px; }
-  table { width: 100%; border-collapse: collapse; }
-  thead th {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+  .login-box input:focus { border-color: var(--accent); }
+
+  .login-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #0f0f0f;
+    border: none;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 12px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: background 0.2s;
+  }
+
+  .login-btn:hover { background: var(--accent-dim); }
+
+  .login-error {
+    color: var(--red);
+    font-size: 12px;
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* ── DASHBOARD ── */
+  #dashboard { display: none; }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .wordmark {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--accent);
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
     color: var(--muted);
-    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .logout-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+  .main {
+    padding: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .section-count {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    border: 1px solid var(--border);
+    overflow-x: auto;
+    margin-bottom: 48px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 16px;
     text-align: left;
     border-bottom: 1px solid var(--border);
-    font-weight: 400;
-  }
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
-  }
-  tbody tr:hover { background: var(--surface); }
-  tbody td {
-    padding: 14px 12px;
-    font-size: 14px;
-  }
-  .name-cell { font-weight: 500; }
-  .phone-cell { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); }
-  .freq-cell { font-family: 'DM Mono', monospace; font-size: 13px; }
-  .date-cell { font-size: 13px; color: var(--muted); }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
     white-space: nowrap;
   }
-  .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .badge-due { background: var(--due-bg); color: var(--due); }
-  .badge-due::before { background: var(--due); }
-  .badge-reminded { background: var(--reminded-bg); color: var(--reminded); }
-  .badge-reminded::before { background: var(--reminded); }
-  .badge-not_due { background: var(--notdue-bg); color: var(--notdue); }
-  .badge-not_due::before { background: var(--notdue); }
-  .badge-opted_out { background: var(--optout-bg); color: var(--optout); }
-  .badge-opted_out::before { background: var(--optout); }
 
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+
+  td {
+    padding: 12px 16px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .td-muted { color: var(--muted); }
+
+  /* ── STATE BADGES ── */
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .badge-not_due     { background: #1a2a1a; color: var(--green); }
+  .badge-due_soon    { background: #2a2a1a; color: var(--yellow); }
+  .badge-due         { background: #2a1f1a; color: var(--orange); }
+  .badge-overdue     { background: #2a1a1a; color: var(--red); }
+  .badge-lapsed      { background: #1a1a2a; color: var(--blue); }
+  .badge-reminded    { background: #1f1f1f; color: var(--muted); }
+  .badge-opted_out   { background: #222; color: #555; }
+
+  /* ── HOLIDAYS ── */
+  .holiday-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 700px) {
+    .holiday-grid { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .form-group input, .form-group textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 9px 10px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus { border-color: var(--accent); }
+
+  .form-group textarea { resize: vertical; min-height: 60px; }
+
+  .form-full { grid-column: 1 / -1; }
+
+  .submit-btn {
+    background: var(--accent);
+    color: #0f0f0f;
+    border: none;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .submit-btn:hover { background: var(--accent-dim); }
+
+  .form-msg {
+    font-size: 11px;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .form-msg.ok { color: var(--green); display: block; }
+  .form-msg.err { color: var(--red); display: block; }
+
+  /* ── HOLIDAY LIST ── */
+  .holiday-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .holiday-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    gap: 12px;
+  }
+
+  .holiday-dates {
+    font-size: 12px;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+
+  .holiday-note {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .delete-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .delete-btn:hover { border-color: var(--red); color: var(--red); }
+
+  .empty-state {
+    color: var(--muted);
+    font-size: 12px;
+    padding: 16px 0;
+  }
+
+  /* ── LOADING ── */
   .loading {
-    text-align: center;
-    padding: 60px 0;
     color: var(--muted);
-    font-size: 14px;
-  }
-  .dot-pulse { display: inline-block; animation: pulse 1.2s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
-
-  .empty {
-    text-align: center;
-    padding: 60px 0;
-    color: var(--muted);
-    font-size: 14px;
+    font-size: 12px;
+    padding: 24px 0;
   }
 
-  @media (max-width: 640px) {
-    .stats { grid-template-columns: repeat(2, 1fr); }
-    header, .filters, .search-bar, .table-wrap { padding-left: 16px; padding-right: 16px; }
-    .stat { padding: 16px; }
-    .stat-num { font-size: 22px; }
-    thead th:nth-child(3), tbody td:nth-child(3) { display: none; }
-    thead th:nth-child(5), tbody td:nth-child(5) { display: none; }
+  .spinner {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
   }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
-<header>
-  <div>
-    <div class="logo">WalkIn<span>.</span></div>
-    <div class="subtitle">Nick Cuts — Customer Dashboard</div>
-  </div>
-  <button class="refresh-btn" onclick="loadCustomers()">↻ Refresh</button>
-</header>
-
-<div class="stats">
-  <div class="stat">
-    <div class="stat-num" id="stat-total">—</div>
-    <div class="stat-label">Total customers</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num" style="color:var(--due)" id="stat-due">—</div>
-    <div class="stat-label">Due for a cut</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num" style="color:var(--reminded)" id="stat-reminded">—</div>
-    <div class="stat-label">Reminded</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num" style="color:var(--optout)" id="stat-optout">—</div>
-    <div class="stat-label">Opted out</div>
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-wordmark">WalkIn.</div>
+    <div class="login-sub">Nick Cuts — Dashboard</div>
+    <label for="l-email">Email</label>
+    <input type="email" id="l-email" placeholder="nick@nickcuts.com" autocomplete="username">
+    <label for="l-pass">Password</label>
+    <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">Sign in</button>
+    <div class="login-error" id="login-error">Incorrect email or password.</div>
   </div>
 </div>
 
-<div class="filters" id="filters">
-  <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
-  <button class="filter-btn" onclick="setFilter('due', this)">Due</button>
-  <button class="filter-btn" onclick="setFilter('reminded', this)">Reminded</button>
-  <button class="filter-btn" onclick="setFilter('not_due', this)">Not due</button>
-  <button class="filter-btn" onclick="setFilter('opted_out', this)">Opted out</button>
-</div>
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="wordmark">WalkIn.</div>
+    <div class="topbar-right">
+      <span id="topbar-name"></span>
+      <button class="logout-btn" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
 
-<div class="search-bar">
-  <input type="text" id="search" placeholder="Search by name or phone..." oninput="renderTable()">
-</div>
+  <div class="main">
 
-<div class="table-wrap">
-  <div class="loading" id="loading"><span class="dot-pulse">Loading customers…</span></div>
-  <table id="table" style="display:none">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Phone</th>
-        <th>Frequency</th>
-        <th>Last visit</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-  </table>
-  <div class="empty" id="empty" style="display:none">No customers match this filter.</div>
+    <!-- CUSTOMERS -->
+    <div class="section-header">
+      <span class="section-title">Customers</span>
+      <span class="section-count" id="customer-count"></span>
+    </div>
+
+    <div class="table-wrap">
+      <div class="loading" id="customers-loading" style="padding:20px 16px">
+        <span class="spinner"></span> Loading customers...
+      </div>
+      <table id="customers-table" style="display:none">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Barber</th>
+            <th>Frequency</th>
+            <th>Last Visit</th>
+            <th>State</th>
+            <th>Opted Out</th>
+          </tr>
+        </thead>
+        <tbody id="customers-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- HOLIDAYS -->
+    <div class="section-header">
+      <span class="section-title">Nick's Holidays</span>
+    </div>
+
+    <div class="holiday-grid">
+
+      <!-- ADD FORM -->
+      <div class="card">
+        <div class="card-title">Add Away Period</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Start Date</label>
+            <input type="date" id="h-start">
+          </div>
+          <div class="form-group">
+            <label>End Date</label>
+            <input type="date" id="h-end">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group form-full">
+            <label>Note (optional)</label>
+            <input type="text" id="h-note" placeholder="e.g. Holiday in Spain">
+          </div>
+        </div>
+        <button class="submit-btn" onclick="addHoliday()">Add Holiday</button>
+        <div class="form-msg" id="holiday-msg"></div>
+      </div>
+
+      <!-- UPCOMING LIST -->
+      <div class="card">
+        <div class="card-title">Upcoming / Active</div>
+        <div id="holiday-list-wrap">
+          <div class="loading"><span class="spinner"></span> Loading...</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
 </div>
 
 <script>
-  const XANO = 'https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm';
-  let allCustomers = [];
-  let currentFilter = 'all';
+  const BASE = 'https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm';
+  let authToken = sessionStorage.getItem('walkin_token') || null;
 
-  async function loadCustomers() {
-    document.getElementById('loading').style.display = 'block';
-    document.getElementById('table').style.display = 'none';
-    document.getElementById('empty').style.display = 'none';
+  // ── AUTO LOGIN IF TOKEN EXISTS ──
+  if (authToken) showDashboard();
+
+  // ── LOGIN ──
+  async function doLogin() {
+    const email = document.getElementById('l-email').value.trim();
+    const pass  = document.getElementById('l-pass').value;
+    const errEl = document.getElementById('login-error');
+    errEl.style.display = 'none';
+
     try {
-      const res = await fetch(XANO + '/customer/all');
-      allCustomers = await res.json();
-      updateStats();
-      renderTable();
+      const res = await fetch(BASE + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.authToken) {
+        errEl.style.display = 'block';
+        return;
+      }
+      authToken = data.authToken;
+      sessionStorage.setItem('walkin_token', authToken);
+      showDashboard();
     } catch(e) {
-      document.getElementById('loading').innerHTML = 'Failed to load. Check your connection.';
+      errEl.style.display = 'block';
     }
   }
 
-  function updateStats() {
-    document.getElementById('stat-total').textContent = allCustomers.length;
-    document.getElementById('stat-due').textContent = allCustomers.filter(c => c.reminder_state === 'due' && !c.opted_out).length;
-    document.getElementById('stat-reminded').textContent = allCustomers.filter(c => c.reminder_state === 'reminded').length;
-    document.getElementById('stat-optout').textContent = allCustomers.filter(c => c.opted_out).length;
+  document.getElementById('l-pass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  function doLogout() {
+    sessionStorage.removeItem('walkin_token');
+    authToken = null;
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
   }
 
-  function setFilter(f, btn) {
-    currentFilter = f;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderTable();
+  function showDashboard() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadCustomers();
+    loadHolidays();
   }
 
-  function renderTable() {
-    const search = document.getElementById('search').value.toLowerCase();
-    let rows = allCustomers.filter(c => {
-      const matchFilter = currentFilter === 'all'
-        ? true
-        : currentFilter === 'opted_out'
-          ? c.opted_out
-          : c.reminder_state === currentFilter && !c.opted_out;
-      const matchSearch = !search ||
-        (c.first_name || '').toLowerCase().includes(search) ||
-        (c.phone || '').toString().includes(search);
-      return matchFilter && matchSearch;
-    });
+  // ── CUSTOMERS ──
+  async function loadCustomers() {
+    try {
+      const res = await fetch(BASE + '/customer/all', {
+        headers: { 'Authorization': 'Bearer ' + authToken }
+      });
+      if (res.status === 401) { doLogout(); return; }
+      const customers = await res.json();
+      document.getElementById('customers-loading').style.display = 'none';
+      document.getElementById('customers-table').style.display = 'table';
 
-    const tbody = document.getElementById('tbody');
-    document.getElementById('loading').style.display = 'none';
+      if (!Array.isArray(customers) || customers.length === 0) {
+        document.getElementById('customers-tbody').innerHTML =
+          '<tr><td colspan="7" class="td-muted">No customers yet.</td></tr>';
+        return;
+      }
 
-    if (rows.length === 0) {
-      document.getElementById('table').style.display = 'none';
-      document.getElementById('empty').style.display = 'block';
+      document.getElementById('customer-count').textContent = customers.length + ' registered';
+
+      const tbody = document.getElementById('customers-tbody');
+      tbody.innerHTML = customers.map(c => {
+        const lastVisit = c.last_visit_at
+          ? new Date(c.last_visit_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+          : '—';
+        const state = c.opted_out ? 'opted_out' : (c.reminder_state || 'not_due');
+        const stateLabel = state.replace('_', ' ');
+        return `<tr>
+          <td>${esc(c.first_name || '—')}</td>
+          <td class="td-muted">${esc(c.phone || '—')}</td>
+          <td class="td-muted">${esc(c.barber_name || '—')}</td>
+          <td class="td-muted">Every ${c.haircut_frequency_weeks || '?'} wks</td>
+          <td class="td-muted">${lastVisit}</td>
+          <td><span class="badge badge-${state}">${stateLabel}</span></td>
+          <td class="td-muted">${c.opted_out ? 'Yes' : '—'}</td>
+        </tr>`;
+      }).join('');
+    } catch(e) {
+      document.getElementById('customers-loading').innerHTML = '<span style="color:var(--red)">Failed to load customers.</span>';
+    }
+  }
+
+  // ── HOLIDAYS ──
+  async function loadHolidays() {
+    try {
+      const res = await fetch(BASE + '/holidays');
+      const holidays = await res.json();
+      const wrap = document.getElementById('holiday-list-wrap');
+
+      if (!Array.isArray(holidays) || holidays.length === 0) {
+        wrap.innerHTML = '<div class="empty-state">No upcoming holidays.</div>';
+        return;
+      }
+
+      wrap.innerHTML = '<div class="holiday-list">' +
+        holidays.map(h => {
+          const start = formatDate(h.start_date);
+          const end   = formatDate(h.end_date);
+          return `<div class="holiday-item">
+            <div>
+              <div class="holiday-dates">${start} → ${end}</div>
+              ${h.note ? `<div class="holiday-note">${esc(h.note)}</div>` : ''}
+            </div>
+            <button class="delete-btn" onclick="deleteHoliday(${h.id})">Remove</button>
+          </div>`;
+        }).join('') +
+      '</div>';
+    } catch(e) {
+      document.getElementById('holiday-list-wrap').innerHTML =
+        '<div style="color:var(--red);font-size:12px">Failed to load holidays.</div>';
+    }
+  }
+
+  async function addHoliday() {
+    const start = document.getElementById('h-start').value;
+    const end   = document.getElementById('h-end').value;
+    const note  = document.getElementById('h-note').value.trim();
+    const msg   = document.getElementById('holiday-msg');
+    msg.className = 'form-msg';
+
+    if (!start || !end) {
+      msg.textContent = 'Please enter both start and end dates.';
+      msg.className = 'form-msg err';
       return;
     }
 
-    document.getElementById('empty').style.display = 'none';
-    document.getElementById('table').style.display = 'table';
+    if (new Date(end) < new Date(start)) {
+      msg.textContent = 'End date must be after start date.';
+      msg.className = 'form-msg err';
+      return;
+    }
 
-    tbody.innerHTML = rows.map(c => {
-      const status = c.opted_out ? 'opted_out' : (c.reminder_state || 'not_due');
-      const label = status === 'opted_out' ? 'Opted out'
-        : status === 'due' ? 'Due'
-        : status === 'reminded' ? 'Reminded'
-        : 'Not due';
-      const lastVisit = c.last_visit_at
-        ? new Date(c.last_visit_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})
-        : '—';
-      const freq = c.haircut_frequency_weeks ? `Every ${c.haircut_frequency_weeks}w` : '—';
-      return `<tr>
-        <td class="name-cell">${c.first_name || '—'}</td>
-        <td class="phone-cell">${c.phone || '—'}</td>
-        <td class="freq-cell">${freq}</td>
-        <td class="date-cell">${lastVisit}</td>
-        <td><span class="badge badge-${status}">${label}</span></td>
-      </tr>`;
-    }).join('');
+    try {
+      const res = await fetch(BASE + '/holiday_add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          barber_id: 1,
+          start_date: new Date(start).getTime(),
+          end_date: new Date(end).getTime(),
+          note: note || null
+        })
+      });
+
+      if (!res.ok) throw new Error();
+
+      msg.textContent = 'Holiday added.';
+      msg.className = 'form-msg ok';
+      document.getElementById('h-start').value = '';
+      document.getElementById('h-end').value = '';
+      document.getElementById('h-note').value = '';
+      loadHolidays();
+    } catch(e) {
+      msg.textContent = 'Failed to add holiday.';
+      msg.className = 'form-msg err';
+    }
   }
 
-  loadCustomers();
+  async function deleteHoliday(id) {
+    if (!confirm('Remove this holiday?')) return;
+    try {
+      await fetch(BASE + '/holiday/' + id, { method: 'DELETE' });
+      loadHolidays();
+    } catch(e) {
+      alert('Failed to delete holiday.');
+    }
+  }
+
+  // ── HELPERS ──
+  function esc(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function formatDate(ts) {
+    return new Date(ts).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  }
 </script>
 </body>
 </html>
