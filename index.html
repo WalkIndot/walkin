@@ -30,35 +30,29 @@
     <button id="checkinBtn" onclick="checkIn()">Check in</button>
     <div id="message" class="message"></div>
   </div>
-
   <script>
     async function checkIn() {
       var phone = document.getElementById('phone').value.trim();
       var btn = document.getElementById('checkinBtn');
       var msg = document.getElementById('message');
-
       if (!phone) {
         msg.className = 'message error';
         msg.textContent = 'Please enter your mobile number.';
         return;
       }
-
       btn.disabled = true;
       btn.textContent = 'Checking in...';
       msg.className = 'message';
-
       try {
         var response = await fetch('https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm/visit/checkin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone: phone, shop_id: 1, barber_id: 1 })
         });
-
         var data = await response.json();
-
         if (response.ok) {
           msg.className = 'message success';
-          msg.textContent = '✓ Checked in. We\'ll message you when you\'re due for your next cut.';
+          msg.textContent = 'Checked in. We\'ll message you when you\'re due for your next cut.';
           btn.textContent = 'Checked in';
         } else {
           msg.className = 'message error';
