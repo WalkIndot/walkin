@@ -10,6 +10,7 @@
     .card { background: #1a1a1a; border: 1px solid #2e2e2e; border-radius: 4px; padding: 40px 32px; max-width: 400px; width: 100%; text-align: center; }
     .wordmark { font-size: 28px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; color: #c8f060; font-family: Georgia, serif; }
     .subtitle { color: #888; font-size: 14px; margin-bottom: 40px; font-family: monospace; }
+    .error-state { color: #ff5c5c; font-size: 13px; font-family: monospace; padding: 20px 0; }
     label { display: block; text-align: left; font-size: 11px; color: #888; margin-bottom: 6px; font-family: monospace; text-transform: uppercase; letter-spacing: 1px; }
     input { width: 100%; padding: 12px 14px; background: #0f0f0f; border: 1px solid #2e2e2e; border-radius: 2px; font-size: 15px; outline: none; transition: border 0.2s; color: #f0ede8; font-family: monospace; }
     input:focus { border-color: #c8f060; }
@@ -25,31 +26,52 @@
   <div class="card">
     <div class="wordmark">WalkIn.</div>
     <div class="subtitle">Stay connected with your barber</div>
-    <label for="phone">Your mobile number</label>
-    <input type="tel" id="phone" placeholder="e.g. 07700 900001" />
-    <button id="checkinBtn" onclick="checkIn()">Check in</button>
+    <div id="form-area">
+      <label for="phone">Your mobile number</label>
+      <input type="tel" id="phone" placeholder="e.g. 07700 900001" />
+      <button id="checkinBtn" onclick="checkIn()">Check in</button>
+    </div>
     <div id="message" class="message"></div>
   </div>
+
   <script>
+    // Read shop_id and barber_id from URL parameters
+    const params = new URLSearchParams(window.location.search);
+    const shopId = parseInt(params.get('shop_id'));
+    const barberId = parseInt(params.get('barber_id'));
+
+    // If either is missing, show an error and hide the form
+    if (!shopId || !barberId) {
+      document.getElementById('form-area').style.display = 'none';
+      const msg = document.getElementById('message');
+      msg.className = 'message error';
+      msg.textContent = 'Invalid check-in link. Please scan the QR code in your barbershop.';
+    }
+
     async function checkIn() {
       var phone = document.getElementById('phone').value.trim();
       var btn = document.getElementById('checkinBtn');
       var msg = document.getElementById('message');
+
       if (!phone) {
         msg.className = 'message error';
         msg.textContent = 'Please enter your mobile number.';
         return;
       }
+
       btn.disabled = true;
       btn.textContent = 'Checking in...';
       msg.className = 'message';
+
       try {
         var response = await fetch('https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm/visit/checkin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: phone, shop_id: 1, barber_id: 1 })
+          body: JSON.stringify({ phone: phone, shop_id: shopId, barber_id: barberId })
         });
+
         var data = await response.json();
+
         if (response.ok) {
           msg.className = 'message success';
           msg.textContent = 'Checked in. We\'ll message you when you\'re due for your next cut.';
