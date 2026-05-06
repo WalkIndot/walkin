@@ -22,207 +22,37 @@
     --green: #60e090;
     --grey: #666;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    min-height: 100vh;
-  }
-
-  #login-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg);
-  }
-
-  .login-box {
-    width: 360px;
-    padding: 48px 40px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-  }
-
-  .login-wordmark {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -1px;
-    color: var(--accent);
-    margin-bottom: 8px;
-  }
-
-  .login-sub {
-    color: var(--muted);
-    font-size: 12px;
-    margin-bottom: 36px;
-  }
-
-  .login-box label {
-    display: block;
-    color: var(--muted);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 6px;
-  }
-
-  .login-box input {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    padding: 10px 12px;
-    margin-bottom: 20px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
+  body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; min-height: 100vh; }
+  #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); }
+  .login-box { width: 360px; padding: 48px 40px; border: 1px solid var(--border); background: var(--surface); }
+  .login-wordmark { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -1px; color: var(--accent); margin-bottom: 8px; }
+  .login-sub { color: var(--muted); font-size: 12px; margin-bottom: 36px; }
+  .login-box label { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .login-box input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; padding: 10px 12px; margin-bottom: 20px; outline: none; transition: border-color 0.2s; }
   .login-box input:focus { border-color: var(--accent); }
-
-  .login-btn {
-    width: 100%;
-    background: var(--accent);
-    color: #0f0f0f;
-    border: none;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    padding: 12px;
-    cursor: pointer;
-    letter-spacing: 0.5px;
-    transition: background 0.2s;
-  }
-
+  .login-btn { width: 100%; background: var(--accent); color: #0f0f0f; border: none; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; padding: 12px; cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s; }
   .login-btn:hover { background: var(--accent-dim); }
-
-  .login-error {
-    color: var(--red);
-    font-size: 12px;
-    margin-top: 12px;
-    display: none;
-  }
-
+  .login-error { color: var(--red); font-size: 12px; margin-top: 12px; display: none; }
   #dashboard { display: none; }
-
-  .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 32px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
-
-  .wordmark {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--accent);
-  }
-
-  .topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    color: var(--muted);
-    font-size: 12px;
-  }
-
-  .logout-btn {
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    padding: 6px 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .wordmark { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); }
+  .topbar-right { display: flex; align-items: center; gap: 20px; color: var(--muted); font-size: 12px; }
+  .logout-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 12px; cursor: pointer; transition: all 0.2s; }
   .logout-btn:hover { border-color: var(--red); color: var(--red); }
-
-  .main {
-    padding: 32px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .section-header {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .section-count {
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  .table-wrap {
-    border: 1px solid var(--border);
-    overflow-x: auto;
-    margin-bottom: 48px;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  thead th {
-    background: var(--surface);
-    color: var(--muted);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 10px 16px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.15s;
-  }
-
+  .main { padding: 32px; max-width: 1200px; margin: 0 auto; }
+  .section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); }
+  .section-count { font-size: 11px; color: var(--muted); }
+  .table-wrap { border: 1px solid var(--border); overflow-x: auto; margin-bottom: 48px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { background: var(--surface); color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: var(--surface2); }
-
-  td {
-    padding: 12px 16px;
-    color: var(--text);
-    white-space: nowrap;
-  }
-
+  td { padding: 12px 16px; color: var(--text); white-space: nowrap; }
   .td-muted { color: var(--muted); }
-
-  .badge {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 500;
-    padding: 3px 8px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-
+  .badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 3px 8px; letter-spacing: 0.5px; text-transform: uppercase; }
   .badge-not_due     { background: #1a2a1a; color: var(--green); }
   .badge-due_soon    { background: #2a2a1a; color: var(--yellow); }
   .badge-due         { background: #2a1f1a; color: var(--orange); }
@@ -230,159 +60,31 @@
   .badge-lapsed      { background: #1a1a2a; color: var(--blue); }
   .badge-reminded    { background: #1f1f1f; color: var(--muted); }
   .badge-opted_out   { background: #222; color: #555; }
-
-  .holiday-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
-
-  @media (max-width: 700px) {
-    .holiday-grid { grid-template-columns: 1fr; }
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 24px;
-  }
-
-  .card-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 20px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .form-group label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--muted);
-  }
-
-  .form-group input, .form-group textarea {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    padding: 9px 10px;
-    outline: none;
-    transition: border-color 0.2s;
-    width: 100%;
-  }
-
-  .form-group input:focus,
-  .form-group textarea:focus { border-color: var(--accent); }
-
+  .holiday-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 700px) { .holiday-grid { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); padding: 24px; }
+  .card-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 20px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .form-group input, .form-group textarea { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 9px 10px; outline: none; transition: border-color 0.2s; width: 100%; }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); }
   .form-group textarea { resize: vertical; min-height: 60px; }
-
   .form-full { grid-column: 1 / -1; }
-
-  .submit-btn {
-    background: var(--accent);
-    color: #0f0f0f;
-    border: none;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 12px;
-    padding: 10px 20px;
-    cursor: pointer;
-    margin-top: 8px;
-    transition: background 0.2s;
-    letter-spacing: 0.5px;
-  }
-
+  .submit-btn { background: var(--accent); color: #0f0f0f; border: none; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; padding: 10px 20px; cursor: pointer; margin-top: 8px; transition: background 0.2s; letter-spacing: 0.5px; }
   .submit-btn:hover { background: var(--accent-dim); }
-
-  .form-msg {
-    font-size: 11px;
-    margin-top: 10px;
-    display: none;
-  }
-
+  .form-msg { font-size: 11px; margin-top: 10px; display: none; }
   .form-msg.ok { color: var(--green); display: block; }
   .form-msg.err { color: var(--red); display: block; }
-
   .holiday-list { display: flex; flex-direction: column; gap: 10px; }
-
-  .holiday-item {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 12px 14px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    gap: 12px;
-  }
-
-  .holiday-dates {
-    font-size: 12px;
-    color: var(--text);
-    margin-bottom: 3px;
-  }
-
-  .holiday-note {
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  .delete-btn {
-    background: none;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    padding: 4px 10px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s;
-    flex-shrink: 0;
-  }
-
+  .holiday-item { display: flex; align-items: flex-start; justify-content: space-between; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); gap: 12px; }
+  .holiday-dates { font-size: 12px; color: var(--text); margin-bottom: 3px; }
+  .holiday-note { font-size: 11px; color: var(--muted); }
+  .delete-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; padding: 4px 10px; cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; }
   .delete-btn:hover { border-color: var(--red); color: var(--red); }
-
-  .empty-state {
-    color: var(--muted);
-    font-size: 12px;
-    padding: 16px 0;
-  }
-
-  .loading {
-    color: var(--muted);
-    font-size: 12px;
-    padding: 24px 0;
-  }
-
-  .spinner {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-    margin-right: 8px;
-    vertical-align: middle;
-  }
-
+  .empty-state { color: var(--muted); font-size: 12px; padding: 16px 0; }
+  .loading { color: var(--muted); font-size: 12px; padding: 24px 0; }
+  .spinner { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
   @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
@@ -411,15 +113,11 @@
       <button class="logout-btn" onclick="doLogout()">Sign out</button>
     </div>
   </div>
-
   <div class="main">
-
-    <!-- CUSTOMERS -->
     <div class="section-header">
       <span class="section-title">Customers</span>
       <span class="section-count" id="customer-count"></span>
     </div>
-
     <div class="table-wrap">
       <div class="loading" id="customers-loading" style="padding:20px 16px">
         <span class="spinner"></span> Loading customers...
@@ -427,26 +125,16 @@
       <table id="customers-table" style="display:none">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Barber</th>
-            <th>Frequency</th>
-            <th>Last Visit</th>
-            <th>State</th>
-            <th>Opted Out</th>
+            <th>Name</th><th>Phone</th><th>Barber</th><th>Frequency</th><th>Last Visit</th><th>State</th><th>Opted Out</th>
           </tr>
         </thead>
         <tbody id="customers-tbody"></tbody>
       </table>
     </div>
-
-    <!-- AWAY PERIODS -->
     <div class="section-header">
       <span class="section-title">Away Periods</span>
     </div>
-
     <div class="holiday-grid">
-
       <div class="card">
         <div class="card-title">Add Away Period</div>
         <div class="form-row">
@@ -468,16 +156,13 @@
         <button class="submit-btn" onclick="addHoliday()">Add Away Period</button>
         <div class="form-msg" id="holiday-msg"></div>
       </div>
-
       <div class="card">
         <div class="card-title">Upcoming / Active</div>
         <div id="holiday-list-wrap">
           <div class="loading"><span class="spinner"></span> Loading...</div>
         </div>
       </div>
-
     </div>
-
   </div>
 </div>
 
@@ -485,6 +170,8 @@
   const BASE = 'https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm';
   const API_KEY = 'walkin-svc-2026-x9k3mq';
   let authToken = sessionStorage.getItem('walkin_token') || null;
+  let barberId = parseInt(sessionStorage.getItem('walkin_barber_id')) || null;
+  let shopId = parseInt(sessionStorage.getItem('walkin_shop_id')) || null;
 
   if (authToken) showDashboard();
 
@@ -501,12 +188,25 @@
         body: JSON.stringify({ field_value: email, password: pass })
       });
       const data = await res.json();
-      if (!res.ok || !data.authToken) {
-        errEl.style.display = 'block';
-        return;
-      }
+      if (!res.ok || !data.authToken) { errEl.style.display = 'block'; return; }
+
       authToken = data.authToken;
       sessionStorage.setItem('walkin_token', authToken);
+
+      // Fetch barber profile
+      const meRes = await fetch(BASE + '/auth/me', {
+        headers: { 'Authorization': 'Bearer ' + authToken }
+      });
+      const me = await meRes.json();
+
+      if (me.barber) {
+        barberId = me.barber.id;
+        shopId = me.barber.shop_id;
+        sessionStorage.setItem('walkin_barber_id', barberId);
+        sessionStorage.setItem('walkin_shop_id', shopId);
+        document.getElementById('topbar-name').textContent = me.barber.name || me.user.name;
+      }
+
       showDashboard();
     } catch(e) {
       errEl.style.display = 'block';
@@ -519,7 +219,9 @@
 
   function doLogout() {
     sessionStorage.removeItem('walkin_token');
-    authToken = null;
+    sessionStorage.removeItem('walkin_barber_id');
+    sessionStorage.removeItem('walkin_shop_id');
+    authToken = null; barberId = null; shopId = null;
     document.getElementById('dashboard').style.display = 'none';
     document.getElementById('login-screen').style.display = 'flex';
   }
@@ -527,6 +229,8 @@
   function showDashboard() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
+    const name = sessionStorage.getItem('walkin_barber_id') ? sessionStorage.getItem('walkin_barber_name') : '';
+    if (name) document.getElementById('topbar-name').textContent = name;
     loadCustomers();
     loadHolidays();
   }
@@ -540,15 +244,12 @@
       const customers = await res.json();
       document.getElementById('customers-loading').style.display = 'none';
       document.getElementById('customers-table').style.display = 'table';
-
       if (!Array.isArray(customers) || customers.length === 0) {
         document.getElementById('customers-tbody').innerHTML =
           '<tr><td colspan="7" class="td-muted">No customers yet.</td></tr>';
         return;
       }
-
       document.getElementById('customer-count').textContent = customers.length + ' registered';
-
       const tbody = document.getElementById('customers-tbody');
       tbody.innerHTML = customers.map(c => {
         const lastVisit = c.last_visit_at
@@ -577,12 +278,10 @@
       const res = await fetch(BASE + '/holidays');
       const holidays = await res.json();
       const wrap = document.getElementById('holiday-list-wrap');
-
       if (!Array.isArray(holidays) || holidays.length === 0) {
         wrap.innerHTML = '<div class="empty-state">No upcoming away periods.</div>';
         return;
       }
-
       wrap.innerHTML = '<div class="holiday-list">' +
         holidays.map(h => {
           const start = formatDate(h.start_date);
@@ -594,8 +293,7 @@
             </div>
             <button class="delete-btn" onclick="deleteHoliday(${h.id})">Remove</button>
           </div>`;
-        }).join('') +
-      '</div>';
+        }).join('') + '</div>';
     } catch(e) {
       document.getElementById('holiday-list-wrap').innerHTML =
         '<div style="color:var(--red);font-size:12px">Failed to load away periods.</div>';
@@ -611,14 +309,15 @@
 
     if (!start || !end) {
       msg.textContent = 'Please enter both start and end dates.';
-      msg.className = 'form-msg err';
-      return;
+      msg.className = 'form-msg err'; return;
     }
-
     if (new Date(end) < new Date(start)) {
       msg.textContent = 'End date must be after start date.';
-      msg.className = 'form-msg err';
-      return;
+      msg.className = 'form-msg err'; return;
+    }
+    if (!barberId) {
+      msg.textContent = 'Session error — please sign out and sign back in.';
+      msg.className = 'form-msg err'; return;
     }
 
     try {
@@ -626,15 +325,13 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          barber_id: 1,
+          barber_id: barberId,
           start_date: new Date(start).getTime(),
           end_date: new Date(end).getTime(),
           note: note || null
         })
       });
-
       if (!res.ok) throw new Error();
-
       msg.textContent = 'Away period added.';
       msg.className = 'form-msg ok';
       document.getElementById('h-start').value = '';
@@ -652,9 +349,7 @@
     try {
       await fetch(BASE + '/holiday/' + id, { method: 'DELETE' });
       loadHolidays();
-    } catch(e) {
-      alert('Failed to remove away period.');
-    }
+    } catch(e) { alert('Failed to remove away period.'); }
   }
 
   function esc(str) {
