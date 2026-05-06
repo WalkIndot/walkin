@@ -182,6 +182,7 @@
     errEl.style.display = 'none';
 
     try {
+      // Step 1 — Login
       const res = await fetch(BASE + '/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -193,18 +194,22 @@
       authToken = data.authToken;
       sessionStorage.setItem('walkin_token', authToken);
 
-      // Fetch barber profile
-      const meRes = await fetch(BASE + '/auth/me', {
-        headers: { 'Authorization': 'Bearer ' + authToken }
-      });
-      const me = await meRes.json();
-
-      if (me.barber) {
-        barberId = me.barber.id;
-        shopId = me.barber.shop_id;
-        sessionStorage.setItem('walkin_barber_id', barberId);
-        sessionStorage.setItem('walkin_shop_id', shopId);
-        document.getElementById('topbar-name').textContent = me.barber.name || me.user.name;
+      // Step 2 — Fetch barber profile (non-fatal if fails)
+      try {
+        const meRes = await fetch(BASE + '/auth/me', {
+          headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+        const me = await meRes.json();
+        if (me.barber) {
+          barberId = me.barber.id;
+          shopId = me.barber.shop_id;
+          sessionStorage.setItem('walkin_barber_id', barberId);
+          sessionStorage.setItem('walkin_shop_id', shopId);
+          sessionStorage.setItem('walkin_barber_name', me.barber.name || '');
+          document.getElementById('topbar-name').textContent = me.barber.name || '';
+        }
+      } catch(meErr) {
+        console.warn('Could not fetch barber profile:', meErr);
       }
 
       showDashboard();
