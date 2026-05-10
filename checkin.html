@@ -3,96 +3,369 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WalkIn. — Check In</title>
+  <title>WalkIn.</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .card { background: #1a1a1a; border: 1px solid #2e2e2e; border-radius: 4px; padding: 40px 32px; max-width: 400px; width: 100%; text-align: center; }
-    .wordmark { font-size: 28px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; color: #c8f060; font-family: Georgia, serif; }
-    .subtitle { color: #888; font-size: 14px; margin-bottom: 40px; font-family: monospace; }
-    .error-state { color: #ff5c5c; font-size: 13px; font-family: monospace; padding: 20px 0; }
-    label { display: block; text-align: left; font-size: 11px; color: #888; margin-bottom: 6px; font-family: monospace; text-transform: uppercase; letter-spacing: 1px; }
-    input { width: 100%; padding: 12px 14px; background: #0f0f0f; border: 1px solid #2e2e2e; border-radius: 2px; font-size: 15px; outline: none; transition: border 0.2s; color: #f0ede8; font-family: monospace; }
-    input:focus { border-color: #c8f060; }
-    button { width: 100%; padding: 13px; background: #c8f060; color: #0f0f0f; border: none; border-radius: 2px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 16px; transition: background 0.2s; font-family: Georgia, serif; letter-spacing: 0.5px; }
-    button:hover { background: #a0c040; }
-    button:disabled { background: #333; color: #666; cursor: not-allowed; }
-    .message { margin-top: 20px; padding: 14px; border-radius: 2px; font-size: 13px; display: none; font-family: monospace; }
-    .message.success { background: #1a2a1a; color: #60e090; display: block; }
-    .message.error { background: #2a1a1a; color: #ff5c5c; display: block; }
+    :root {
+      --bg: #0C0C0A;
+      --surface: #161614;
+      --border: #252522;
+      --border-active: #C9A84C;
+      --text: #F5F0E6;
+      --muted: #6b6960;
+      --accent: #C9A84C;
+      --accent-dim: #a8893a;
+      --green-bg: #0d1f16;
+      --red-bg: #1f0d0d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100vh; background: var(--bg); }
+    body { font-family: 'DM Mono', monospace; color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 20px 48px; min-height: 100vh; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+    .wrap { position: relative; z-index: 1; width: 100%; max-width: 400px; }
+    .wordmark { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; letter-spacing: -1.5px; color: var(--accent); text-align: center; margin-bottom: 6px; }
+    .tagline { text-align: center; font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 40px; }
+    .card { background: var(--surface); border: 1px solid var(--border); padding: 32px 28px; }
+    .card-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .card-sub { font-size: 11px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 7px; }
+    .field input, .field select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px; padding: 11px 13px; outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; }
+    .field input:focus, .field select:focus { border-color: var(--border-active); }
+    .field input::placeholder { color: var(--muted); }
+    .field input[readonly] { color: var(--muted); cursor: default; }
+    .field select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6960' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 13px center; background-color: var(--bg); padding-right: 36px; }
+    .field select option { background: #161614; }
+    .consent { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 24px; cursor: pointer; }
+    .consent input[type="checkbox"] { display: none; }
+    .consent-box { width: 18px; height: 18px; min-width: 18px; border: 1px solid var(--border); background: var(--bg); display: flex; align-items: center; justify-content: center; transition: all 0.15s; margin-top: 1px; }
+    .consent input:checked + .consent-box { border-color: var(--accent); background: #1f1a0d; }
+    .consent input:checked + .consent-box::after { content: ''; width: 8px; height: 5px; border-left: 1.5px solid var(--accent); border-bottom: 1.5px solid var(--accent); transform: rotate(-45deg) translateY(-1px); display: block; }
+    .consent-text { font-size: 11px; color: var(--muted); line-height: 1.6; }
+    .btn { width: 100%; background: var(--accent); color: #0C0C0A; border: none; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; padding: 13px; cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s; }
+    .btn:hover { background: var(--accent-dim); }
+    .btn:disabled { background: #2a2a26; color: #555; cursor: not-allowed; }
+    .btn-secondary { width: 100%; background: transparent; color: var(--muted); border: 1px solid var(--border); font-family: 'DM Mono', monospace; font-size: 12px; padding: 11px; cursor: pointer; margin-top: 10px; transition: all 0.2s; }
+    .btn-secondary:hover { border-color: var(--muted); color: var(--text); }
+    .msg { margin-top: 16px; padding: 12px 14px; font-size: 12px; line-height: 1.5; display: none; }
+    .msg.ok { background: var(--green-bg); color: #6ee0a0; border: 1px solid #1a3a28; display: block; }
+    .msg.err { background: var(--red-bg); color: #e08080; border: 1px solid #3a1a1a; display: block; }
+    .welcome-back { font-size: 13px; color: var(--accent); margin-bottom: 16px; padding: 10px 12px; border: 1px solid #2a2210; background: #1a1608; }
+    .confirm-icon { width: 56px; height: 56px; border: 2px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+    .confirm-icon::after { content: ''; width: 20px; height: 12px; border-left: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-45deg) translateY(-2px); display: block; }
+    .confirm-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 8px; text-align: center; }
+    .confirm-name { color: var(--accent); }
+    .confirm-sub { font-size: 12px; color: var(--muted); line-height: 1.7; text-align: center; }
+    #screen-loading { text-align: center; padding: 40px 0; }
+    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 12px; color: var(--muted); }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .fade-in { animation: fadeIn 0.35s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .footer { margin-top: 32px; text-align: center; font-size: 10px; color: #3a3a36; letter-spacing: 0.5px; }
+    .footer a { color: #3a3a36; text-decoration: none; margin: 0 10px; }
+    .footer a:hover { color: var(--muted); }
   </style>
 </head>
 <body>
-  <div class="card">
+  <div class="wrap">
     <div class="wordmark">WalkIn.</div>
-    <div class="subtitle">Stay connected with your barber</div>
-    <div id="form-area">
-      <label for="phone">Your mobile number</label>
-      <input type="tel" id="phone" placeholder="e.g. 07700 900001" />
-      <button id="checkinBtn" onclick="checkIn()">Check in</button>
+    <div class="tagline">Stay connected with your barber</div>
+
+    <!-- Loading -->
+    <div id="screen-loading" class="screen active">
+      <div class="card fade-in" style="text-align:center;padding:40px 28px">
+        <div class="spinner"></div>
+        <div class="loading-text">One moment...</div>
+      </div>
     </div>
-    <div id="message" class="message"></div>
+
+    <!-- Phone entry -->
+    <div id="screen-phone" class="screen">
+      <div class="card fade-in">
+        <div class="card-title">Check in</div>
+        <div class="card-sub">Enter your mobile number to check in or register.</div>
+        <div class="field">
+          <label>Mobile number <span style="color:var(--accent)">*</span></label>
+          <input type="tel" id="p-phone" placeholder="e.g. 07700 900001" autocomplete="tel">
+        </div>
+        <button class="btn" id="phone-btn" onclick="lookupPhone()">Continue</button>
+        <div class="msg" id="phone-msg"></div>
+      </div>
+    </div>
+
+    <!-- Welcome back (returning customer, no cookie) -->
+    <div id="screen-returning" class="screen">
+      <div class="card fade-in">
+        <div class="welcome-back" id="returning-greeting">Welcome back!</div>
+        <div class="card-sub">We found your details. Tap below to check in.</div>
+        <button class="btn" id="returning-btn" onclick="doReturningCheckin()">Check in</button>
+        <button class="btn-secondary" onclick="showScreen('screen-phone')">Not you? Go back</button>
+        <div class="msg" id="returning-msg"></div>
+      </div>
+    </div>
+
+    <!-- Full registration form -->
+    <div id="screen-register" class="screen">
+      <div class="card fade-in">
+        <div class="card-title">Stay connected</div>
+        <div class="card-sub">Register once and we'll remind you when you're due for your next cut. Takes 20 seconds.</div>
+        <div class="field">
+          <label>First name <span style="color:var(--accent)">*</span></label>
+          <input type="text" id="r-firstname" placeholder="e.g. James" autocomplete="given-name">
+        </div>
+        <div class="field">
+          <label>Last name</label>
+          <input type="text" id="r-lastname" placeholder="Optional" autocomplete="family-name">
+        </div>
+        <div class="field">
+          <label>Mobile number</label>
+          <input type="tel" id="r-phone" autocomplete="tel" readonly>
+        </div>
+        <div class="field">
+          <label>Your barber's name</label>
+          <input type="text" id="r-barber" placeholder="Optional">
+        </div>
+        <div class="field">
+          <label>How often do you get a haircut?</label>
+          <select id="r-frequency">
+            <option value="">Select frequency</option>
+            <option value="1">Every week</option>
+            <option value="2">Every 2 weeks</option>
+            <option value="3">Every 3 weeks</option>
+            <option value="4">Every 4 weeks</option>
+            <option value="5">Every 5 weeks</option>
+            <option value="6">Every 6 weeks</option>
+            <option value="8">Every 8 weeks</option>
+            <option value="8">Less often / varies</option>
+          </select>
+        </div>
+        <label class="consent">
+          <input type="checkbox" id="r-consent">
+          <span class="consent-box"></span>
+          <span class="consent-text">I'm happy to receive a few reminder messages when I'm due for a cut. I can reply STOP at any time to opt out.</span>
+        </label>
+        <button class="btn" id="register-btn" onclick="doRegister()">Register</button>
+        <button class="btn-secondary" onclick="showScreen('screen-phone')">Go back</button>
+        <div class="msg" id="register-msg"></div>
+      </div>
+    </div>
+
+    <!-- Confirmation -->
+    <div id="screen-confirm" class="screen">
+      <div class="card fade-in" style="padding: 40px 28px;">
+        <div class="confirm-icon"></div>
+        <div class="confirm-title">Checked in<span class="confirm-name" id="confirm-name"></span></div>
+        <div class="confirm-sub" id="confirm-sub">We'll message you when you're due for your next cut.</div>
+      </div>
+    </div>
+
   </div>
-  <div style="text-align:center; margin-top: 32px; font-family: monospace; font-size: 11px;">
-    <a href="/privacy.html" style="color: #444; text-decoration: none; margin: 0 12px;">Privacy Policy</a>
-    <a href="/terms.html" style="color: #444; text-decoration: none; margin: 0 12px;">Terms of Service</a>
+
+  <div class="footer">
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms of Service</a>
   </div>
 
   <script>
-    // Read shop_id and barber_id from URL parameters
+    const XANO = 'https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm';
+    const COOKIE_NAME = 'walkin_phone';
+    const COOKIE_DAYS = 365;
+
     const params = new URLSearchParams(window.location.search);
     const shopId = parseInt(params.get('shop_id'));
     const barberId = parseInt(params.get('barber_id'));
 
-    // If either is missing, show an error and hide the form
-    if (!shopId || !barberId) {
-      document.getElementById('form-area').style.display = 'none';
-      const msg = document.getElementById('message');
-      msg.className = 'message error';
-      msg.textContent = 'Invalid check-in link. Please scan the QR code in your barbershop.';
+    var lookedUpPhone = '';
+    var lookedUpName = '';
+
+    function setCookie(name, value, days) {
+      var expires = new Date(Date.now() + days * 864e5).toUTCString();
+      document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/; SameSite=Lax';
+    }
+    function getCookie(name) {
+      var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    }
+    function clearCookie(name) {
+      document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     }
 
-    async function checkIn() {
-      var phone = document.getElementById('phone').value.trim();
-      var btn = document.getElementById('checkinBtn');
-      var msg = document.getElementById('message');
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+      document.getElementById(id).classList.add('active');
+    }
+
+    function showConfirm(name, isNew) {
+      document.getElementById('confirm-name').textContent = name ? ', ' + name : '';
+      document.getElementById('confirm-sub').textContent = isNew
+        ? "You're all set. We'll message you when you're due for your next cut. Reply STOP at any time to opt out."
+        : "Visit logged. We'll remind you when you're due for your next cut.";
+      showScreen('screen-confirm');
+    }
+
+    async function autoCheckin(phone) {
+      try {
+        var res = await fetch(XANO + '/visit/checkin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phone, shop_id: shopId, barber_id: barberId })
+        });
+        var data = await res.json();
+        if (res.ok) {
+          showConfirm(data.first_name || '', false);
+        } else {
+          clearCookie(COOKIE_NAME);
+          showScreen('screen-phone');
+        }
+      } catch(e) {
+        clearCookie(COOKIE_NAME);
+        showScreen('screen-phone');
+      }
+    }
+
+    async function lookupPhone() {
+      var phone = document.getElementById('p-phone').value.trim().replace(/\s/g, '');
+      var btn = document.getElementById('phone-btn');
+      var msg = document.getElementById('phone-msg');
+      msg.className = 'msg';
 
       if (!phone) {
-        msg.className = 'message error';
+        msg.className = 'msg err';
         msg.textContent = 'Please enter your mobile number.';
         return;
       }
 
       btn.disabled = true;
-      btn.textContent = 'Checking in...';
-      msg.className = 'message';
+      btn.textContent = 'Checking...';
 
       try {
-        var response = await fetch('https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm/visit/checkin', {
+        var res = await fetch(XANO + '/customer/lookup?phone=' + encodeURIComponent(phone));
+        var data = await res.json();
+        lookedUpPhone = phone;
+
+        if (Array.isArray(data) && data.length > 0) {
+          lookedUpName = data[0].first_name || '';
+          document.getElementById('returning-greeting').textContent =
+            lookedUpName ? 'Welcome back, ' + lookedUpName + '!' : 'Welcome back!';
+          showScreen('screen-returning');
+        } else {
+          document.getElementById('r-phone').value = phone;
+          showScreen('screen-register');
+        }
+      } catch(e) {
+        msg.className = 'msg err';
+        msg.textContent = 'Something went wrong. Please try again.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Continue';
+      }
+    }
+
+    async function doReturningCheckin() {
+      var btn = document.getElementById('returning-btn');
+      var msg = document.getElementById('returning-msg');
+      msg.className = 'msg';
+      btn.disabled = true;
+      btn.textContent = 'Checking in...';
+
+      try {
+        var res = await fetch(XANO + '/visit/checkin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: phone, shop_id: shopId, barber_id: barberId })
+          body: JSON.stringify({ phone: lookedUpPhone, shop_id: shopId, barber_id: barberId })
         });
-
-        var data = await response.json();
-
-        if (response.ok) {
-          msg.className = 'message success';
-          msg.textContent = 'Checked in. We\'ll message you when you\'re due for your next cut.';
-          btn.textContent = 'Checked in';
+        if (res.ok) {
+          setCookie(COOKIE_NAME, lookedUpPhone, COOKIE_DAYS);
+          showConfirm(lookedUpName, false);
         } else {
-          msg.className = 'message error';
-          msg.textContent = 'We couldn\'t find your number. Please register with your barber first.';
+          msg.className = 'msg err';
+          msg.textContent = 'Something went wrong. Please try again.';
           btn.disabled = false;
           btn.textContent = 'Check in';
         }
-      } catch(err) {
-        msg.className = 'message error';
+      } catch(e) {
+        msg.className = 'msg err';
         msg.textContent = 'Something went wrong. Please try again.';
         btn.disabled = false;
         btn.textContent = 'Check in';
       }
     }
+
+    async function doRegister() {
+      var firstName = document.getElementById('r-firstname').value.trim();
+      var lastName = document.getElementById('r-lastname').value.trim();
+      var phone = document.getElementById('r-phone').value.trim().replace(/\s/g, '');
+      var barberName = document.getElementById('r-barber').value.trim();
+      var frequencyWeeks = parseInt(document.getElementById('r-frequency').value) || 4;
+      var consent = document.getElementById('r-consent').checked;
+      var btn = document.getElementById('register-btn');
+      var msg = document.getElementById('register-msg');
+      msg.className = 'msg';
+
+      if (!firstName) { msg.className = 'msg err'; msg.textContent = 'Please enter your first name.'; return; }
+      if (!phone) { msg.className = 'msg err'; msg.textContent = 'Please enter your mobile number.'; return; }
+      if (!consent) { msg.className = 'msg err'; msg.textContent = "Please tick the box to confirm you're happy to receive reminders."; return; }
+
+      btn.disabled = true;
+      btn.textContent = 'Registering...';
+
+      try {
+        var regRes = await fetch(XANO + '/customer/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            first_name: firstName,
+            last_name: lastName || null,
+            phone: phone,
+            shop_id: shopId,
+            barber_name: barberName || null,
+            haircut_frequency_weeks: frequencyWeeks
+          })
+        });
+        if (!regRes.ok) throw new Error('Registration failed');
+
+        await fetch(XANO + '/visit/checkin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phone, shop_id: shopId, barber_id: barberId })
+        });
+
+        setCookie(COOKIE_NAME, phone, COOKIE_DAYS);
+        showConfirm(firstName, true);
+
+      } catch(e) {
+        msg.className = 'msg err';
+        msg.textContent = 'Something went wrong. Please try again.';
+        btn.disabled = false;
+        btn.textContent = 'Register';
+      }
+    }
+
+    document.getElementById('p-phone').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') lookupPhone();
+    });
+
+    function init() {
+      if (!shopId || !barberId) {
+        showScreen('screen-phone');
+        var msg = document.getElementById('phone-msg');
+        msg.className = 'msg err';
+        msg.textContent = 'Invalid check-in link. Please scan the QR code in your barbershop.';
+        document.getElementById('phone-btn').disabled = true;
+        return;
+      }
+      var phone = getCookie(COOKIE_NAME);
+      if (phone) {
+        autoCheckin(phone);
+      } else {
+        showScreen('screen-phone');
+      }
+    }
+
+    init();
   </script>
 </body>
 </html>
