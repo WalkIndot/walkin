@@ -67,8 +67,9 @@
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
   .form-group label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
-  .form-group input, .form-group textarea { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 9px 10px; outline: none; transition: border-color 0.2s; width: 100%; }
-  .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); }
+  .form-group input, .form-group textarea, .form-group select { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 9px 10px; outline: none; transition: border-color 0.2s; width: 100%; }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
+  .form-group select option { background: var(--bg); }
   .form-group textarea { resize: vertical; min-height: 60px; }
   .form-full { grid-column: 1 / -1; }
   .submit-btn { background: var(--accent); color: #0f0f0f; border: none; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; padding: 10px 20px; cursor: pointer; margin-top: 8px; transition: background 0.2s; letter-spacing: 0.5px; }
@@ -86,6 +87,14 @@
   .loading { color: var(--muted); font-size: 12px; padding: 24px 0; }
   .spinner { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 48px; }
+  @media (max-width: 700px) { .settings-grid { grid-template-columns: 1fr; } }
+  .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px; }
+  .day-toggle { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+  .day-toggle input[type="checkbox"] { display: none; }
+  .day-box { width: 100%; padding: 8px 4px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.15s; cursor: pointer; }
+  .day-toggle input:checked + .day-box { border-color: var(--accent); background: #1a2200; color: var(--accent); }
+  .settings-note { font-size: 10px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -114,6 +123,8 @@
     </div>
   </div>
   <div class="main">
+
+    <!-- CUSTOMERS -->
     <div class="section-header">
       <span class="section-title">Customers</span>
       <span class="section-count" id="customer-count"></span>
@@ -131,10 +142,12 @@
         <tbody id="customers-tbody"></tbody>
       </table>
     </div>
+
+    <!-- AWAY PERIODS -->
     <div class="section-header">
       <span class="section-title">Away Periods</span>
     </div>
-    <div class="holiday-grid">
+    <div class="holiday-grid" style="margin-bottom:48px">
       <div class="card">
         <div class="card-title">Add Away Period</div>
         <div class="form-row">
@@ -163,6 +176,52 @@
         </div>
       </div>
     </div>
+
+    <!-- SHOP SETTINGS -->
+    <div class="section-header">
+      <span class="section-title">Shop Settings</span>
+    </div>
+    <div class="settings-grid">
+      <div class="card">
+        <div class="card-title">Working Days</div>
+        <div class="settings-note">Tick the days your shop is open. Reminders will only be sent on working days, and return dates in holiday messages will reflect your schedule.</div>
+        <div class="days-grid">
+          <label class="day-toggle"><input type="checkbox" id="day-1" value="1"><span class="day-box">Mon</span></label>
+          <label class="day-toggle"><input type="checkbox" id="day-2" value="2"><span class="day-box">Tue</span></label>
+          <label class="day-toggle"><input type="checkbox" id="day-3" value="3"><span class="day-box">Wed</span></label>
+          <label class="day-toggle"><input type="checkbox" id="day-4" value="4"><span class="day-box">Thu</span></label>
+          <label class="day-toggle"><input type="checkbox" id="day-5" value="5"><span class="day-box">Fri</span></label>
+          <label class="day-toggle"><input type="checkbox" id="day-6" value="6"><span class="day-box">Sat</span></label>
+          <label class="day-toggle"><input type="checkbox" id="day-7" value="7"><span class="day-box">Sun</span></label>
+        </div>
+        <button class="submit-btn" onclick="saveWorkingDays()">Save Working Days</button>
+        <div class="form-msg" id="working-days-msg"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Reminder Send Time</div>
+        <div class="settings-note">Set the hour of day when reminder messages are sent to customers. Default is 10am. Changes take effect from the next scheduled send.</div>
+        <div class="form-group" style="margin-bottom:16px">
+          <label>Send Hour</label>
+          <select id="reminder-send-hour">
+            <option value="7">7am</option>
+            <option value="8">8am</option>
+            <option value="9">9am</option>
+            <option value="10" selected>10am</option>
+            <option value="11">11am</option>
+            <option value="12">12pm (noon)</option>
+            <option value="13">1pm</option>
+            <option value="14">2pm</option>
+            <option value="15">3pm</option>
+            <option value="16">4pm</option>
+            <option value="17">5pm</option>
+            <option value="18">6pm</option>
+          </select>
+        </div>
+        <button class="submit-btn" onclick="saveReminderHour()">Save Send Time</button>
+        <div class="form-msg" id="reminder-hour-msg"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -180,9 +239,7 @@
     const pass  = document.getElementById('l-pass').value;
     const errEl = document.getElementById('login-error');
     errEl.style.display = 'none';
-
     try {
-      // Step 1 — Login
       const res = await fetch(BASE + '/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -190,11 +247,8 @@
       });
       const data = await res.json();
       if (!res.ok || !data.authToken) { errEl.style.display = 'block'; return; }
-
       authToken = data.authToken;
       sessionStorage.setItem('walkin_token', authToken);
-
-      // Step 2 — Fetch barber profile (non-fatal if fails)
       try {
         const meRes = await fetch(BASE + '/auth/me', {
           headers: { 'Authorization': 'Bearer ' + authToken }
@@ -208,14 +262,9 @@
           sessionStorage.setItem('walkin_barber_name', me.barber.name || '');
           document.getElementById('topbar-name').textContent = me.barber.name || '';
         }
-      } catch(meErr) {
-        console.warn('Could not fetch barber profile:', meErr);
-      }
-
+      } catch(meErr) { console.warn('Could not fetch barber profile:', meErr); }
       showDashboard();
-    } catch(e) {
-      errEl.style.display = 'block';
-    }
+    } catch(e) { errEl.style.display = 'block'; }
   }
 
   document.getElementById('l-pass').addEventListener('keydown', e => {
@@ -234,17 +283,16 @@
   function showDashboard() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
-    const name = sessionStorage.getItem('walkin_barber_id') ? sessionStorage.getItem('walkin_barber_name') : '';
+    const name = sessionStorage.getItem('walkin_barber_name') || '';
     if (name) document.getElementById('topbar-name').textContent = name;
     loadCustomers();
     loadHolidays();
+    loadShopSettings();
   }
 
   async function loadCustomers() {
     try {
-      const res = await fetch(BASE + '/customer/all', {
-        headers: { 'X-Api-Key': API_KEY }
-      });
+      const res = await fetch(BASE + '/customer/all', { headers: { 'X-Api-Key': API_KEY } });
       if (res.status === 401) { doLogout(); return; }
       const customers = await res.json();
       document.getElementById('customers-loading').style.display = 'none';
@@ -305,13 +353,79 @@
     }
   }
 
+  async function loadShopSettings() {
+    if (!shopId) return;
+    try {
+      const res = await fetch(BASE + '/shop/settings?shop_id=' + shopId);
+      if (!res.ok) return;
+      const shop = await res.json();
+      if (shop.working_days) {
+        const days = shop.working_days.split(',').map(d => d.trim());
+        days.forEach(d => {
+          const cb = document.getElementById('day-' + d);
+          if (cb) cb.checked = true;
+        });
+      }
+      if (shop.reminder_send_hour !== undefined && shop.reminder_send_hour !== null) {
+        document.getElementById('reminder-send-hour').value = shop.reminder_send_hour;
+      }
+    } catch(e) { console.warn('Could not load shop settings:', e); }
+  }
+
+  async function saveWorkingDays() {
+    if (!shopId) return;
+    const msg = document.getElementById('working-days-msg');
+    msg.className = 'form-msg';
+    const checked = [];
+    for (let i = 1; i <= 7; i++) {
+      const cb = document.getElementById('day-' + i);
+      if (cb && cb.checked) checked.push(i);
+    }
+    if (checked.length === 0) {
+      msg.textContent = 'Please select at least one working day.';
+      msg.className = 'form-msg err'; return;
+    }
+    try {
+      const res = await fetch(BASE + '/shop/update_settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shop_id: shopId, working_days: checked.join(',') })
+      });
+      if (!res.ok) throw new Error();
+      msg.textContent = 'Working days saved.';
+      msg.className = 'form-msg ok';
+    } catch(e) {
+      msg.textContent = 'Failed to save working days.';
+      msg.className = 'form-msg err';
+    }
+  }
+
+  async function saveReminderHour() {
+    if (!shopId) return;
+    const msg = document.getElementById('reminder-hour-msg');
+    msg.className = 'form-msg';
+    const hour = parseInt(document.getElementById('reminder-send-hour').value);
+    try {
+      const res = await fetch(BASE + '/shop/update_settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shop_id: shopId, reminder_send_hour: hour })
+      });
+      if (!res.ok) throw new Error();
+      msg.textContent = 'Send time saved.';
+      msg.className = 'form-msg ok';
+    } catch(e) {
+      msg.textContent = 'Failed to save send time.';
+      msg.className = 'form-msg err';
+    }
+  }
+
   async function addHoliday() {
     const start = document.getElementById('h-start').value;
     const end   = document.getElementById('h-end').value;
     const note  = document.getElementById('h-note').value.trim();
     const msg   = document.getElementById('holiday-msg');
     msg.className = 'form-msg';
-
     if (!start || !end) {
       msg.textContent = 'Please enter both start and end dates.';
       msg.className = 'form-msg err'; return;
@@ -324,7 +438,6 @@
       msg.textContent = 'Session error — please sign out and sign back in.';
       msg.className = 'form-msg err'; return;
     }
-
     try {
       const res = await fetch(BASE + '/holiday_add', {
         method: 'POST',
