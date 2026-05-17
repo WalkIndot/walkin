@@ -96,7 +96,7 @@
       </div>
     </div>
 
-    <!-- Welcome back (returning customer, no cookie) -->
+    <!-- Welcome back (returning customer) -->
     <div id="screen-returning" class="screen">
       <div class="card fade-in">
         <div class="welcome-back" id="returning-greeting">Welcome back!</div>
@@ -125,11 +125,7 @@
           <input type="tel" id="r-phone" autocomplete="tel" readonly>
         </div>
         <div class="field">
-          <label>Your barber's name</label>
-          <input type="text" id="r-barber" placeholder="Optional">
-        </div>
-        <div class="field">
-          <label>How often do you get a haircut?</label>
+          <label>How often do you get a haircut? <span style="color:var(--accent)">*</span></label>
           <select id="r-frequency">
             <option value="">Select frequency</option>
             <option value="1">Every week</option>
@@ -143,7 +139,7 @@
           </select>
         </div>
         <label class="consent">
-          <input type="checkbox" id="r-consent">
+          <input type="checkbox" id="r-consent" checked>
           <span class="consent-box"></span>
           <span class="consent-text">I'm happy to receive a few reminder messages when I'm due for a cut. I can reply STOP at any time to opt out.</span>
         </label>
@@ -158,7 +154,7 @@
       <div class="card fade-in" style="padding: 40px 28px;">
         <div class="confirm-icon"></div>
         <div class="confirm-title">Checked in<span class="confirm-name" id="confirm-name"></span></div>
-        <div class="confirm-sub" id="confirm-sub">We'll message you when you're due for your next cut.</div>
+        <div class="confirm-sub" id="confirm-sub">We'll message you when you're due for your next cut. Reply STOP at any time to opt out.</div>
       </div>
     </div>
 
@@ -298,7 +294,6 @@
       var firstName = document.getElementById('r-firstname').value.trim();
       var lastName = document.getElementById('r-lastname').value.trim();
       var phone = document.getElementById('r-phone').value.trim().replace(/\s/g, '');
-      var barberName = document.getElementById('r-barber').value.trim();
       var frequencyWeeks = parseInt(document.getElementById('r-frequency').value) || 4;
       var consent = document.getElementById('r-consent').checked;
       var btn = document.getElementById('register-btn');
@@ -307,6 +302,7 @@
 
       if (!firstName) { msg.className = 'msg err'; msg.textContent = 'Please enter your first name.'; return; }
       if (!phone) { msg.className = 'msg err'; msg.textContent = 'Please enter your mobile number.'; return; }
+      if (!document.getElementById('r-frequency').value) { msg.className = 'msg err'; msg.textContent = 'Please select how often you get a haircut.'; return; }
       if (!consent) { msg.className = 'msg err'; msg.textContent = "Please tick the box to confirm you're happy to receive reminders."; return; }
 
       btn.disabled = true;
@@ -321,7 +317,7 @@
             last_name: lastName || null,
             phone: phone,
             shop_id: shopId,
-            barber_name: barberName || null,
+            barber_id: barberId,
             haircut_frequency_weeks: frequencyWeeks
           })
         });
