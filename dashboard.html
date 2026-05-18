@@ -227,6 +227,7 @@
 
 <script>
   const BASE = 'https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm';
+  const BARBERS = { 1: 'Nick' };
   const API_KEY = 'walkin-svc-2026-x9k3mq';
   let authToken = sessionStorage.getItem('walkin_token') || null;
   let barberId = parseInt(sessionStorage.getItem('walkin_barber_id')) || null;
@@ -313,7 +314,7 @@
         return `<tr>
           <td>${esc(c.first_name || '—')}</td>
           <td class="td-muted">${esc(c.phone || '—')}</td>
-          <td class="td-muted">${esc(c.barber_name || '—')}</td>
+          <td class="td-muted">${esc(BARBERS[c.barber_id] || '—')}</td>
           <td class="td-muted">Every ${c.haircut_frequency_weeks || '?'} wks</td>
           <td class="td-muted">${lastVisit}</td>
           <td><span class="badge badge-${state}">${stateLabel}</span></td>
