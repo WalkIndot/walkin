@@ -213,11 +213,11 @@
         if (res.ok) {
           showConfirm(data.first_name || '', false);
         } else {
-          clearCookie(COOKIE_NAME);
+          localStorage.removeItem(COOKIE_NAME);
           showScreen('screen-phone');
         }
       } catch(e) {
-        clearCookie(COOKIE_NAME);
+        localStorage.removeItem(COOKIE_NAME);
         showScreen('screen-phone');
       }
     }
@@ -274,7 +274,7 @@
           body: JSON.stringify({ phone: lookedUpPhone, shop_id: shopId, barber_id: barberId })
         });
         if (res.ok) {
-          setCookie(COOKIE_NAME, lookedUpPhone, COOKIE_DAYS);
+          localStorage.setItem(COOKIE_NAME, lookedUpPhone);
           showConfirm(lookedUpName, false);
         } else {
           msg.className = 'msg err';
@@ -329,7 +329,7 @@
           body: JSON.stringify({ phone: phone, shop_id: shopId, barber_id: barberId })
         });
 
-        setCookie(COOKIE_NAME, phone, COOKIE_DAYS);
+        localStorage.setItem(COOKIE_NAME, phone);
         showConfirm(firstName, true);
 
       } catch(e) {
@@ -353,7 +353,7 @@
         document.getElementById('phone-btn').disabled = true;
         return;
       }
-      var phone = getCookie(COOKIE_NAME);
+      var phone = localStorage.getItem(COOKIE_NAME);
       if (phone) {
         autoCheckin(phone);
       } else {
