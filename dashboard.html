@@ -222,7 +222,63 @@
       </div>
     </div>
 
-  </div>
+  <!-- ADD CUSTOMER MANUALLY -->
+    <div class="section-header">
+      <span class="section-title">Add Customer</span>
+    </div>
+    <div class="settings-grid" style="margin-bottom:48px">
+      <div class="card">
+        <div class="card-title">Manual Registration</div>
+        <div class="settings-note">Add an existing regular directly — no QR scan needed. They'll enter the reminder cycle immediately.</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name <span style="color:var(--accent)">*</span></label>
+            <input type="text" id="mc-firstname" placeholder="e.g. James">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="mc-lastname" placeholder="Optional">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Mobile Number <span style="color:var(--accent)">*</span></label>
+            <input type="tel" id="mc-phone" placeholder="e.g. 07700900001">
+          </div>
+          <div class="form-group">
+            <label>Haircut Frequency <span style="color:var(--accent)">*</span></label>
+            <select id="mc-frequency">
+              <option value="">Select...</option>
+              <option value="1">Every week</option>
+              <option value="2">Every 2 weeks</option>
+              <option value="3">Every 3 weeks</option>
+              <option value="4">Every 4 weeks</option>
+              <option value="5">Every 5 weeks</option>
+              <option value="6">Every 6 weeks</option>
+              <option value="8">Every 8 weeks</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group form-full">
+            <label>Last Visit Date (optional)</label>
+            <input type="date" id="mc-lastvisit">
+          </div>
+        </div>
+        <button class="submit-btn" onclick="addCustomerManually()">Add Customer</button>
+        <div class="form-msg" id="mc-msg"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">How This Works</div>
+        <div class="settings-note" style="line-height:2">
+          — Customer is registered directly into WalkIn.<br>
+          — If you enter their last visit date, the reminder engine will calculate where they are in their cycle immediately.<br>
+          — If no last visit date is entered, they'll be treated as due and receive a reminder on the next send.<br>
+          — They'll receive a message from you when they're due — same as any QR-registered customer.<br>
+          — You can always remove a customer by contacting support.
+        </div>
+      </div>
+    </div></div>
 </div>
 
 <script>
@@ -471,6 +527,116 @@
     } catch(e) { alert('Failed to remove away period.'); }
   }
 
+  async function addCustomerManually() {
+    const firstName     = document.getElementById('mc-firstname').value.trim();
+    const lastName      = document.getElementById('mc-lastname').value.trim();
+    const phone         = document.getElementById('mc-phone').value.trim().replace(/\s/g, '');
+    const frequencyWeeks = parseInt(document.getElementById('mc-frequency').value);
+    const lastVisitDate = document.getElementById('mc-lastvisit').value;
+    const msg           = document.getElementById('mc-msg');
+    msg.className = 'form-msg';
+
+    // Validation
+    if (!firstName) {
+      msg.textContent = 'Please enter a first name.';
+      msg.className = 'form-msg err'; return;
+    }
+    if (!phone || phone.length < 10) {
+      msg.textContent = 'Please enter a valid mobile number.';
+      msg.className = 'form-msg err'; return;
+    }
+    if (!frequencyWeeks) {
+      msg.textContent = 'Please select a haircut frequency.';
+      msg.className = 'form-msg err'; return;
+    }
+    if (!shopId || !barberId) {
+      msg.textContent = 'Session error — please sign out and sign back in.';
+      msg.className = 'form-msg err'; return;
+    }
+
+    const btn = document.querySelector('[onclick="addCustomerManually()"]');
+    btn.disabled = true;
+    btn.textContent = 'Adding...';
+
+    try {
+      // Step 1 — Register the customer
+      const regRes = await fetch(BASE + '/customer/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name:              firstName,
+          last_name:               lastName || null,
+          phone:                   phone,
+          shop_id:                 shopId,
+          barber_id:               barberId,
+          haircut_frequency_weeks: frequencyWeeks
+        })
+      });
+
+      if (!regRes.ok) {
+        const errData = await regRes.json().catch(() => ({}));
+        if (regRes.status === 422 || (errData.message && errData.message.toLowerCase().includes('duplicate'))) {
+          msg.textContent = 'This number is already registered.';
+        } else {
+          msg.textContent = 'Failed to add customer. Please try again.';
+        }
+        msg.className = 'form-msg err';
+        btn.disabled = false; btn.textContent = 'Add Customer'; return;
+      }
+
+      const newCustomer = await regRes.json();
+      const customerId  = newCustomer.id || null;
+
+      // Step 2 — Log a visit if a last visit date was provided
+      if (lastVisitDate) {
+        await fetch(BASE + '/visit/checkin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone:     phone,
+            shop_id:   shopId,
+            barber_id: barberId,
+            visited_at: new Date(lastVisitDate).getTime()
+          })
+        }).catch(() => {});
+      }
+
+      // Step 3 — Log the event
+      fetch(BASE + '/customer/log_event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer_id:               customerId,
+          customer_name:             firstName,
+          event_type:                'registered',
+          event_detail:              'Customer added manually by barber via dashboard. Frequency: every ' + frequencyWeeks + ' week(s).' + (lastVisitDate ? ' Last visit date provided: ' + lastVisitDate + '.' : ' No last visit date provided — will be treated as due.'),
+          reminder_state_at_event:   'not_due',
+          days_since_last_visit:     lastVisitDate ? Math.floor((Date.now() - new Date(lastVisitDate).getTime()) / (1000 * 60 * 60 * 24)) : 0,
+          visit_was_reminder_driven: false
+        })
+      }).catch(() => {});
+
+      // Step 4 — Clear form and reload customer table
+      document.getElementById('mc-firstname').value  = '';
+      document.getElementById('mc-lastname').value   = '';
+      document.getElementById('mc-phone').value      = '';
+      document.getElementById('mc-frequency').value  = '';
+      document.getElementById('mc-lastvisit').value  = '';
+
+      msg.textContent = firstName + ' added successfully. They\'ll appear in the customer table now.';
+      msg.className = 'form-msg ok';
+
+      loadCustomers();
+
+    } catch(e) {
+      msg.textContent = 'Something went wrong. Please try again.';
+      msg.className = 'form-msg err';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Add Customer';
+    }
+  }
+  
   function esc(str) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
