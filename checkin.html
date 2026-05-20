@@ -314,15 +314,17 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            first_name: firstName,
-            last_name: lastName || null,
-            phone: phone,
-            shop_id: shopId,
-            barber_id: barberId,
-            haircut_frequency_weeks: frequencyWeeks
-          })
-        });
-        if (!regRes.ok) throw new Error('Registration failed');
+          first_name: firstName,
+        last_name: lastName || null,
+        phone: phone,
+        shop_id: shopId,
+        barber_id: barberId,
+      haircut_frequency_weeks: frequencyWeeks
+    })
+  });
+  if (!regRes.ok) throw new Error('Registration failed');
+var regData = await regRes.json();
+var newCustomerId = regData.id || null;
 
         await fetch(XANO + '/visit/checkin', {
           method: 'POST',
@@ -336,7 +338,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            customer_id: null,
+            customer_id: newCustomerId,
             customer_name: firstName,
             event_type: 'registered',
             event_detail: 'Customer registered via QR check-in page. Frequency stated: every ' + frequencyWeeks + ' week(s). Phone: ' + phone + '.',
