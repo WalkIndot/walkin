@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WalkIn. Founder Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:         #0a0a0a;
+    --surface:    #141414;
+    --surface2:   #1c1c1c;
+    --border:     #272727;
+    --text:       #f0ede8;
+    --muted:      #666;
+    --muted2:     #3a3a3a;
+    --accent:     #D4A843;
+    --accent-dim: #A8832E;
+    --accent-glow:rgba(212,168,67,0.10);
+    --red:        #ff5c5c;
+    --orange:     #ff9a3c;
+    --yellow:     #ffd460;
+    --blue:       #60b8f0;
+    --green:      #60e090;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; min-height: 100vh; }
+
+  /* ── LOGIN ──────────────────────────────────────────── */
+  #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .login-box { width: 360px; padding: 48px 40px; border: 1px solid var(--border); background: var(--surface); position: relative; }
+  .login-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); }
+  .login-wordmark { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -1px; color: var(--text); margin-bottom: 6px; }
+  .login-wordmark span { color: var(--accent); }
+  .login-tag { display: inline-block; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); background: var(--accent-glow); border: 1px solid rgba(212,168,67,0.3); padding: 3px 10px; margin-bottom: 36px; }
+  .login-box label { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 7px; }
+  .login-box input[type="password"] { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px; padding: 11px 13px; margin-bottom: 20px; outline: none; transition: border-color 0.2s; }
+  .login-box input:focus { border-color: var(--accent); }
+  .login-btn { width: 100%; background: var(--accent); color: #0a0a0a; border: none; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; padding: 13px; cursor: pointer; letter-spacing: 1.5px; text-transform: uppercase; transition: background 0.2s; }
+  .login-btn:hover { background: var(--accent-dim); }
+  .login-error { color: var(--red); font-size: 11px; margin-top: 12px; display: none; }
+
+  /* ── LAYOUT ─────────────────────────────────────────── */
+  #app { display: none; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 100; }
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
+  .wordmark { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); }
+  .wordmark span { color: var(--accent); }
+  .founder-badge { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); background: var(--accent-glow); border: 1px solid rgba(212,168,67,0.25); padding: 3px 9px; }
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .last-refresh { font-size: 10px; color: var(--muted); }
+  .topbar-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; padding: 5px 12px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; }
+  .topbar-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .topbar-btn.danger:hover { border-color: var(--red); color: var(--red); }
+  .main { padding: 32px; max-width: 1300px; margin: 0 auto; }
+
+  /* ── SECTION HEADERS ────────────────────────────────── */
+  .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; margin-top: 40px; }
+  .section-header:first-of-type { margin-top: 0; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); white-space: nowrap; }
+  .section-rule { flex: 1; height: 1px; background: var(--border); }
+
+  /* ── HEADLINE METRICS ───────────────────────────────── */
+  .metrics-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  @media (max-width: 900px) { .metrics-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 560px) { .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
+  .metric-card { background: var(--surface); padding: 22px 20px 18px; }
+  .metric-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .metric-value { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; color: var(--text); line-height: 1; margin-bottom: 5px; transition: color 0.3s; }
+  .metric-sub { font-size: 9px; color: var(--muted); letter-spacing: 0.5px; }
+  .col-accent  { color: var(--accent); }
+  .col-green   { color: var(--green); }
+  .col-orange  { color: var(--orange); }
+  .col-red     { color: var(--red); }
+  .col-blue    { color: var(--blue); }
+  .col-muted   { color: var(--muted); }
+
+  /* ── CONVERSION CARDS ───────────────────────────────── */
+  .conv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 700px) { .conv-grid { grid-template-columns: 1fr; } }
+  .conv-card { background: var(--surface); border: 1px solid var(--border); padding: 26px 24px; position: relative; overflow: hidden; }
+  .conv-card::after { content: ''; position: absolute; bottom: 0; left: 0; height: 2px; background: var(--accent); width: 0; transition: width 1s ease; }
+  .conv-card.loaded::after { width: 100%; }
+  .conv-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .conv-value { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; color: var(--accent); line-height: 1; margin-bottom: 8px; }
+  .conv-desc { font-size: 10px; color: var(--muted); line-height: 1.7; }
+
+  /* ── STATE DISTRIBUTION ─────────────────────────────── */
+  .state-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  @media (max-width: 800px) { .state-grid { grid-template-columns: repeat(4, 1fr); } }
+  .state-card { background: var(--surface); padding: 18px 10px; text-align: center; }
+  .state-count { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; line-height: 1; margin-bottom: 7px; }
+  .state-name { font-size: 8px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+  .s-not_due   { color: var(--green); }
+  .s-due_soon  { color: var(--yellow); }
+  .s-due       { color: var(--orange); }
+  .s-overdue   { color: var(--red); }
+  .s-lapsed    { color: var(--blue); }
+  .s-reminded  { color: var(--muted); }
+  .s-opted_out { color: #3a3a3a; }
+
+  /* ── LAPSED ALERT ───────────────────────────────────── */
+  .lapsed-alert { display: none; margin-top: 12px; background: rgba(96,184,240,0.05); border: 1px solid rgba(96,184,240,0.18); padding: 14px 18px; display: none; align-items: center; gap: 14px; }
+  .lapsed-alert.show { display: flex; }
+  .lapsed-dot { width: 7px; height: 7px; background: var(--blue); border-radius: 50%; flex-shrink: 0; animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+  .lapsed-text { font-size: 11px; color: var(--blue); line-height: 1.6; }
+  .lapsed-text strong { color: var(--text); }
+
+  /* ── TWO-COL (health + trend) ───────────────────────── */
+  .health-trend-grid { display: grid; grid-template-columns: 260px 1fr; gap: 16px; }
+  @media (max-width: 800px) { .health-trend-grid { grid-template-columns: 1fr; } }
+  .health-stack { display: flex; flex-direction: column; gap: 12px; }
+  .health-card { background: var(--surface); border: 1px solid var(--border); padding: 18px 20px; }
+  .health-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .health-value { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .health-sub { font-size: 10px; color: var(--muted); }
+
+  /* ── TREND CHART ────────────────────────────────────── */
+  .trend-card { background: var(--surface); border: 1px solid var(--border); padding: 22px 24px; }
+  .trend-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .trend-title { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .trend-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
+  .bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; min-width: 0; }
+  .bar-val  { font-size: 9px; color: var(--muted); min-height: 12px; }
+  .bar      { width: 100%; background: var(--accent); min-height: 2px; transition: height 0.6s ease; }
+  .bar.zero { background: var(--muted2); }
+  .bar-lbl  { font-size: 8px; color: var(--muted); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+  /* ── ACTIVITY + JOURNEY ─────────────────────────────── */
+  .feed-journey-grid { display: grid; grid-template-columns: 1fr 380px; gap: 16px; }
+  @media (max-width: 1000px) { .feed-journey-grid { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); }
+  .panel-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .panel-title { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
+  .panel-sub { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); margin-top: 3px; }
+
+  .filter-row { display: flex; gap: 5px; }
+  .filter-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 9px; padding: 3px 9px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.5px; }
+  .filter-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+
+  .scrollable { max-height: 460px; overflow-y: auto; }
+  .scrollable::-webkit-scrollbar { width: 3px; }
+  .scrollable::-webkit-scrollbar-track { background: transparent; }
+  .scrollable::-webkit-scrollbar-thumb { background: var(--border); }
+
+  /* Feed items */
+  .feed-item { padding: 11px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 11px; align-items: flex-start; cursor: pointer; transition: background 0.1s; }
+  .feed-item:hover { background: var(--surface2); }
+  .feed-item:last-child { border-bottom: none; }
+  .event-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .dot-registered   { background: var(--green); }
+  .dot-visit        { background: var(--accent); }
+  .dot-sms_sent     { background: var(--blue); }
+  .dot-state_change { background: var(--muted2); }
+  .dot-opted_out    { background: var(--red); }
+  .dot-resubscribed { background: var(--green); }
+  .feed-body { flex: 1; min-width: 0; }
+  .feed-name   { font-size: 12px; color: var(--text); margin-bottom: 2px; }
+  .feed-detail { font-size: 10px; color: var(--muted); }
+  .feed-time   { font-size: 9px; color: var(--muted2); flex-shrink: 0; padding-top: 2px; }
+  .panel-empty { padding: 36px 20px; text-align: center; color: var(--muted); font-size: 11px; line-height: 1.9; }
+
+  /* Journey */
+  .journey-item { padding: 10px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-start; }
+  .journey-item:last-child { border-bottom: none; }
+  .j-line { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 8px; }
+  .j-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .j-connector { width: 1px; background: var(--border); flex: 1; min-height: 14px; margin-top: 2px; }
+  .j-body  { flex: 1; padding-bottom: 8px; }
+  .j-event { font-size: 11px; color: var(--text); margin-bottom: 2px; line-height: 1.4; }
+  .j-time  { font-size: 9px; color: var(--muted2); }
+
+  /* ── CUSTOMERS TABLE ────────────────────────────────── */
+  .table-wrap { border: 1px solid var(--border); overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { background: var(--surface); color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: 1px; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  td { padding: 10px 14px; font-size: 12px; white-space: nowrap; }
+  td.dim { color: var(--muted); }
+  .badge { display: inline-block; font-size: 9px; padding: 2px 7px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-not_due   { background: #1a2a1a; color: var(--green); }
+  .badge-due_soon  { background: #2a2a1a; color: var(--yellow); }
+  .badge-due       { background: #2a1f1a; color: var(--orange); }
+  .badge-overdue   { background: #2a1a1a; color: var(--red); }
+  .badge-lapsed    { background: #1a1a2a; color: var(--blue); }
+  .badge-reminded  { background: #1e1e1e; color: var(--muted); }
+  .badge-opted_out { background: #1a1a1a; color: #444; }
+
+  /* ── CONCERN FLAGS ──────────────────────────────────── */
+  .flag { display: flex; align-items: flex-start; gap: 10px; padding: 11px 16px; background: rgba(255,92,92,0.04); border: 1px solid rgba(255,92,92,0.14); margin-bottom: 8px; }
+  .flag-icon { font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+  .flag-msg { font-size: 11px; color: var(--muted); line-height: 1.6; }
+  .flag-msg strong { color: var(--text); }
+
+  /* ── LOADING ────────────────────────────────────────── */
+  .loading-line { padding: 18px 16px; color: var(--muted); font-size: 11px; }
+  .spinner { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-wordmark">WalkIn<span>.</span></div>
+    <div class="login-tag">Founder Dashboard</div>
+    <label for="l-pass">Access Code</label>
+    <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">Enter</button>
+    <div class="login-error" id="login-error">Incorrect access code.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="wordmark">WalkIn<span>.</span></div>
+      <div class="founder-badge">Founder</div>
+    </div>
+    <div class="topbar-right">
+      <span class="last-refresh" id="last-refresh"></span>
+      <button class="topbar-btn" onclick="loadAll()">↻ Refresh</button>
+      <button class="topbar-btn danger" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- ── PILOT SCORECARD ──────────────────────────────── -->
+    <div class="section-header" style="margin-top:0">
+      <span class="section-title">Pilot Scorecard — Nick Cuts</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Customers</div>
+        <div class="metric-value col-accent" id="m-total">—</div>
+        <div class="metric-sub">registered</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Reminders Sent</div>
+        <div class="metric-value" id="m-reminders">—</div>
+        <div class="metric-sub">total SMS</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Active</div>
+        <div class="metric-value col-green" id="m-active">—</div>
+        <div class="metric-sub">not lapsed / opted out</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Lapsed</div>
+        <div class="metric-value" id="m-lapsed">—</div>
+        <div class="metric-sub">gone quiet</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Opt-out Rate</div>
+        <div class="metric-value" id="m-optout">—</div>
+        <div class="metric-sub">of all customers</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Pilot Days</div>
+        <div class="metric-value col-accent" id="m-days">—</div>
+        <div class="metric-sub">since first signup</div>
+      </div>
+    </div>
+
+    <!-- ── CONVERSION INTELLIGENCE ──────────────────────── -->
+    <div class="section-header">
+      <span class="section-title">Conversion Intelligence</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="conv-grid">
+      <div class="conv-card" id="conv-0">
+        <div class="conv-label">Reminder → Return Rate</div>
+        <div class="conv-value" id="c-rate">—</div>
+        <div class="conv-desc">Of customers who received a reminder, the share that came back for a visit. This is the number that proves WalkIn. works.</div>
+      </div>
+      <div class="conv-card" id="conv-1">
+        <div class="conv-label">Avg. Days to Return</div>
+        <div class="conv-value" id="c-days">—</div>
+        <div class="conv-desc">Average number of days between a reminder being sent and the customer's next check-in visit.</div>
+      </div>
+      <div class="conv-card" id="conv-2">
+        <div class="conv-label">Reminder-Driven Visits</div>
+        <div class="conv-value" id="c-driven">—</div>
+        <div class="conv-desc">Visits recorded while the customer was in a reminded state — the direct commercial proof metric for investors.</div>
+      </div>
+    </div>
+
+    <!-- ── CUSTOMER STATES ───────────────────────────────── -->
+    <div class="section-header">
+      <span class="section-title">Customer States</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="state-grid">
+      <div class="state-card"><div class="state-count s-not_due"  id="st-not_due">—</div><div class="state-name">Not Due</div></div>
+      <div class="state-card"><div class="state-count s-due_soon" id="st-due_soon">—</div><div class="state-name">Due Soon</div></div>
+      <div class="state-card"><div class="state-count s-due"      id="st-due">—</div><div class="state-name">Due</div></div>
+      <div class="state-card"><div class="state-count s-overdue"  id="st-overdue">—</div><div class="state-name">Overdue</div></div>
+      <div class="state-card"><div class="state-count s-lapsed"   id="st-lapsed">—</div><div class="state-name">Lapsed</div></div>
+      <div class="state-card"><div class="state-count s-reminded" id="st-reminded">—</div><div class="state-name">Reminded</div></div>
+      <div class="state-card"><div class="state-count s-opted_out" id="st-opted_out">—</div><div class="state-name">Opted Out</div></div>
+    </div>
+    <div class="lapsed-alert" id="lapsed-alert">
+      <div class="lapsed-dot"></div>
+      <div class="lapsed-text" id="lapsed-text"></div>
+    </div>
+
+    <!-- ── SYSTEM HEALTH + WEEKLY SIGNUPS ───────────────── -->
+    <div class="section-header">
+      <span class="section-title">System Health &amp; Weekly Signups</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="health-trend-grid">
+      <div class="health-stack">
+        <div class="health-card">
+          <div class="health-label">Last Customer Event</div>
+          <div class="health-value" id="h-event">—</div>
+          <div class="health-sub" id="h-event-sub">—</div>
+        </div>
+        <div class="health-card">
+          <div class="health-label">Last Reminder Run</div>
+          <div class="health-value" id="h-sms">—</div>
+          <div class="health-sub" id="h-sms-sub">—</div>
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-top">
+          <span class="trend-title">New Signups Per Week</span>
+          <span style="font-size:9px;color:var(--muted);letter-spacing:1px">LAST 8 WEEKS</span>
+        </div>
+        <div class="trend-chart" id="trend-chart">
+          <div class="loading-line"><span class="spinner"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ACTIVITY FEED + CUSTOMER JOURNEY ─────────────── -->
+    <div class="section-header">
+      <span class="section-title">Activity &amp; Customer Journeys</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="feed-journey-grid">
+
+      <!-- Feed -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Event Feed</span>
+          <div class="filter-row">
+            <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+            <button class="filter-btn" onclick="setFilter('registered',this)">Signups</button>
+            <button class="filter-btn" onclick="setFilter('visit',this)">Visits</button>
+            <button class="filter-btn" onclick="setFilter('sms_sent',this)">SMS</button>
+          </div>
+        </div>
+        <div class="scrollable" id="feed-list">
+          <div class="panel-empty"><span class="spinner"></span> Loading events...</div>
+        </div>
+      </div>
+
+      <!-- Journey -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Customer Journey</div>
+            <div class="panel-sub" id="journey-name">— select a customer —</div>
+          </div>
+        </div>
+        <div class="scrollable" id="journey-list">
+          <div class="panel-empty">Click any event in the feed<br>or any row in the table below<br>to view that customer's journey.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── ALL CUSTOMERS ─────────────────────────────────── -->
+    <div class="section-header">
+      <span class="section-title">All Customers</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="table-wrap">
+      <div class="loading-line" id="tbl-loading"><span class="spinner"></span> Loading customers...</div>
+      <table id="customers-table" style="display:none">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Frequency</th>
+            <th>Last Visit</th>
+            <th>State</th>
+            <th>Opted Out</th>
+            <th>Reminder-Driven Visits</th>
+          </tr>
+        </thead>
+        <tbody id="customers-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- ── CONCERN FLAGS ─────────────────────────────────── -->
+    <div id="flags-section" style="display:none">
+      <div class="section-header">
+        <span class="section-title">Concern Flags</span>
+        <div class="section-rule"></div>
+      </div>
+      <div id="flags-list"></div>
+    </div>
+
+    <div style="height:56px"></div>
+  </div>
+</div>
+
+<script>
+  const BASE    = 'https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm';
+  const API_KEY = 'walkin-svc-2026-x9k3mq';
+  const PASS    = 'founder1';
+
+  let allCustomers = [];
+  let allEvents    = [];
+  let activeFilter = 'all';
+
+  // ── AUTH ────────────────────────────────────────────────
+  if (sessionStorage.getItem('wf') === '1') showApp();
+
+  function doLogin() {
+    const v = document.getElementById('l-pass').value;
+    if (v === PASS) { sessionStorage.setItem('wf', '1'); showApp(); }
+    else document.getElementById('login-error').style.display = 'block';
+  }
+  document.getElementById('l-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  function doLogout() {
+    sessionStorage.removeItem('wf');
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+  function showApp() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadAll();
+  }
+
+  // ── DATA LOAD ───────────────────────────────────────────
+  async function loadAll() {
+    document.getElementById('last-refresh').textContent = 'Refreshing…';
+    await Promise.all([fetchCustomers(), fetchEvents()]);
+    document.getElementById('last-refresh').textContent =
+      'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  async function fetchCustomers() {
+    try {
+      const res = await fetch(BASE + '/customer/all', { headers: { 'X-Api-Key': API_KEY } });
+      const data = await res.json();
+      allCustomers = Array.isArray(data) ? data : [];
+      renderTable();
+    } catch(e) {
+      document.getElementById('tbl-loading').innerHTML = '<span style="color:var(--red)">Failed to load customers.</span>';
+    }
+  }
+
+  async function fetchEvents() {
+    try {
+      const res  = await fetch(BASE + '/customer/events');
+      const data = await res.json();
+      allEvents = Array.isArray(data) ? data : [];
+      computeMetrics();
+      renderFeed();
+      renderTrend();
+      renderHealth();
+      setTimeout(() => {
+        ['conv-0','conv-1','conv-2'].forEach(id => document.getElementById(id).classList.add('loaded'));
+      }, 400);
+    } catch(e) {
+      document.getElementById('feed-list').innerHTML =
+        '<div class="panel-empty" style="color:var(--red)">Failed to load events.</div>';
+    }
+  }
+
+  // ── METRICS ─────────────────────────────────────────────
+  function computeMetrics() {
+    const total    = allCustomers.length;
+    const lapsed   = allCustomers.filter(c => !c.opted_out && c.reminder_state === 'lapsed').length;
+    const optedOut = allCustomers.filter(c => c.opted_out).length;
+    const active   = total - lapsed - optedOut;
+    const smsSent  = allEvents.filter(e => e.event_type === 'sms_sent').length;
+
+    // Pilot age
+    const regTimes = allEvents.filter(e => e.event_type === 'registered').map(e => e.created_at).sort();
+    const pilotDays = regTimes.length > 0 ? Math.floor((Date.now() - regTimes[0]) / 86400000) : 0;
+
+    const optRate = total > 0 ? Math.round((optedOut / total) * 100) : 0;
+
+    set('m-total',     total);
+    set('m-reminders', smsSent);
+    set('m-active',    active);
+    set('m-lapsed',    lapsed);
+    set('m-optout',    optRate + '%');
+    set('m-days',      pilotDays);
+
+    // Dynamic colouring
+    const lEl = document.getElementById('m-lapsed');
+    lEl.className = 'metric-value ' + (lapsed === 0 ? 'col-green' : lapsed < 3 ? 'col-orange' : 'col-red');
+    const oEl = document.getElementById('m-optout');
+    oEl.className = 'metric-value ' + (optRate === 0 ? 'col-green' : optRate < 10 ? '' : 'col-orange');
+
+    // State distribution
+    ['not_due','due_soon','due','overdue','lapsed','reminded'].forEach(s => {
+      const n = allCustomers.filter(c => !c.opted_out && c.reminder_state === s).length;
+      set('st-' + s, n);
+    });
+    set('st-opted_out', optedOut);
+
+    // Lapsed alert
+    const lAlert = document.getElementById('lapsed-alert');
+    if (lapsed > 0) {
+      const names = allCustomers.filter(c => !c.opted_out && c.reminder_state === 'lapsed').map(c => c.first_name).join(', ');
+      document.getElementById('lapsed-text').innerHTML =
+        `<strong>${lapsed} customer${lapsed > 1 ? 's' : ''} lapsed</strong> — ${names}. These customers haven't returned after receiving all reminders. Consider a direct word from Nick.`;
+      lAlert.classList.add('show');
+    } else {
+      lAlert.classList.remove('show');
+    }
+
+    computeConversion();
+    renderFlags();
+  }
+
+  function computeConversion() {
+    // Build per-customer event lists sorted ascending
+    const byId = {};
+    allEvents.forEach(e => {
+      if (!byId[e.customer_id]) byId[e.customer_id] = [];
+      byId[e.customer_id].push(e);
+    });
+    Object.keys(byId).forEach(id => byId[id].sort((a,b) => a.created_at - b.created_at));
+
+    let reminded = 0, returned = 0;
+    const daysArr = [];
+
+    Object.keys(byId).forEach(id => {
+      const evs = byId[id];
+      const firstSms = evs.find(e => e.event_type === 'sms_sent');
+      if (!firstSms) return;
+      reminded++;
+      const returnVisit = evs.find(e => e.event_type === 'visit' && e.created_at > firstSms.created_at);
+      if (returnVisit) {
+        returned++;
+        daysArr.push((returnVisit.created_at - firstSms.created_at) / 86400000);
+      }
+    });
+
+    // Reminder-driven visits
+    const driven = allEvents.filter(e => e.event_type === 'visit' && e.visit_was_reminder_driven === true).length;
+
+    set('c-rate',   reminded > 0 ? Math.round((returned / reminded) * 100) + '%' : '—');
+    set('c-days',   daysArr.length > 0 ? Math.round(daysArr.reduce((a,b) => a+b,0) / daysArr.length) + 'd' : '—');
+    set('c-driven', driven);
+  }
+
+  // ── TREND ───────────────────────────────────────────────
+  function renderTrend() {
+    const regs = allEvents.filter(e => e.event_type === 'registered');
+    const now  = Date.now();
+    const buckets = [];
+
+    for (let i = 7; i >= 0; i--) {
+      const start = now - ((i + 1) * 7 * 86400000);
+      const end   = now - (i * 7 * 86400000);
+      const count = regs.filter(e => e.created_at >= start && e.created_at < end).length;
+      buckets.push({ label: i === 0 ? 'this wk' : i + 'w ago', count });
+    }
+
+    const max = Math.max(...buckets.map(b => b.count), 1);
+    document.getElementById('trend-chart').innerHTML = buckets.map(b => {
+      const h = Math.round((b.count / max) * 76);
+      return `<div class="bar-wrap">
+        <div class="bar-val">${b.count > 0 ? b.count : ''}</div>
+        <div class="bar ${b.count === 0 ? 'zero' : ''}" style="height:${Math.max(h,2)}px"></div>
+        <div class="bar-lbl">${b.label}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── HEALTH ──────────────────────────────────────────────
+  function renderHealth() {
+    if (!allEvents.length) {
+      set('h-event',     'No events yet');
+      set('h-event-sub', 'System awaiting first customer');
+      set('h-sms',       'None sent yet');
+      set('h-sms-sub',   'Apps Script running nightly');
+      return;
+    }
+    const latest = allEvents[0];
+    set('h-event',     timeAgo(latest.created_at));
+    set('h-event-sub', (latest.customer_name || 'Unknown') + ' — ' + fmtType(latest.event_type));
+
+    const lastSms = allEvents.find(e => e.event_type === 'sms_sent');
+    if (lastSms) {
+      set('h-sms',     timeAgo(lastSms.created_at));
+      set('h-sms-sub', 'Last sent to ' + (lastSms.customer_name || 'a customer'));
+      document.getElementById('h-sms').className = 'health-value col-green';
+    } else {
+      set('h-sms',     'None sent yet');
+      set('h-sms-sub', 'No reminders during pilot so far');
+    }
+  }
+
+  // ── ACTIVITY FEED ────────────────────────────────────────
+  function setFilter(type, btn) {
+    activeFilter = type;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderFeed();
+  }
+
+  function renderFeed() {
+    const filtered = activeFilter === 'all' ? allEvents : allEvents.filter(e => e.event_type === activeFilter);
+    const el = document.getElementById('feed-list');
+    if (!filtered.length) { el.innerHTML = '<div class="panel-empty">No events yet.</div>'; return; }
+    el.innerHTML = filtered.slice(0, 120).map(e => `
+      <div class="feed-item" onclick="showJourney(${e.customer_id},'${esc(e.customer_name||'')}')">
+        <div class="event-dot dot-${e.event_type}"></div>
+        <div class="feed-body">
+          <div class="feed-name">${esc(e.customer_name || 'Unknown')}</div>
+          <div class="feed-detail">${fmtType(e.event_type)}${e.event_detail ? ' — ' + esc(e.event_detail) : ''}</div>
+        </div>
+        <div class="feed-time">${timeAgo(e.created_at)}</div>
+      </div>`).join('');
+  }
+
+  // ── JOURNEY ─────────────────────────────────────────────
+  function showJourney(customerId, name) {
+    document.getElementById('journey-name').textContent = name || 'Customer #' + customerId;
+    const evs = allEvents.filter(e => e.customer_id === customerId).sort((a,b) => a.created_at - b.created_at);
+    const el  = document.getElementById('journey-list');
+    if (!evs.length) { el.innerHTML = '<div class="panel-empty">No events found.</div>'; return; }
+    el.innerHTML = evs.map((e, i) => `
+      <div class="journey-item">
+        <div class="j-line">
+          <div class="j-dot" style="background:${dotColor(e.event_type)}"></div>
+          ${i < evs.length - 1 ? '<div class="j-connector"></div>' : ''}
+        </div>
+        <div class="j-body">
+          <div class="j-event">${fmtType(e.event_type)}${e.event_detail ? ' — ' + esc(e.event_detail) : ''}</div>
+          <div class="j-time">${fmtDateTime(e.created_at)}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  // ── CUSTOMER TABLE ───────────────────────────────────────
+  function renderTable() {
+    document.getElementById('tbl-loading').style.display = 'none';
+    const tbl = document.getElementById('customers-table');
+    tbl.style.display = 'table';
+    if (!allCustomers.length) {
+      document.getElementById('customers-tbody').innerHTML =
+        '<tr><td colspan="7" class="dim">No customers registered yet.</td></tr>';
+      return;
+    }
+    document.getElementById('customers-tbody').innerHTML = allCustomers.map(c => {
+      const state = c.opted_out ? 'opted_out' : (c.reminder_state || 'not_due');
+      const lv    = c.last_visit_at
+        ? new Date(c.last_visit_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+        : '—';
+      const driven = allEvents.filter(e =>
+        e.customer_id === c.id && e.event_type === 'visit' && e.visit_was_reminder_driven === true
+      ).length;
+      return `<tr onclick="showJourney(${c.id},'${esc(c.first_name||'')}')">
+        <td>${esc((c.first_name||'') + (c.last_name ? ' ' + c.last_name : '')) || '—'}</td>
+        <td class="dim">${esc(c.phone||'—')}</td>
+        <td class="dim">Every ${c.haircut_frequency_weeks||'?'}w</td>
+        <td class="dim">${lv}</td>
+        <td><span class="badge badge-${state}">${state.replace(/_/g,' ')}</span></td>
+        <td class="dim">${c.opted_out ? 'Yes' : '—'}</td>
+        <td class="dim">${driven > 0 ? driven + (driven > 1 ? ' visits' : ' visit') : '—'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ── CONCERN FLAGS ────────────────────────────────────────
+  function renderFlags() {
+    const flags = [];
+    const byId  = {};
+    allEvents.forEach(e => {
+      if (!byId[e.customer_id]) byId[e.customer_id] = [];
+      byId[e.customer_id].push(e);
+    });
+    Object.keys(byId).forEach(id => byId[id].sort((a,b) => a.created_at - b.created_at));
+
+    // Multiple reminders, no return
+    Object.keys(byId).forEach(id => {
+      const evs    = byId[id];
+      const smsList = evs.filter(e => e.event_type === 'sms_sent');
+      if (smsList.length < 2) return;
+      const returnV = evs.find(e => e.event_type === 'visit' && e.created_at > smsList[0].created_at);
+      if (!returnV) {
+        const name = evs[0].customer_name || 'Customer #' + id;
+        flags.push(`<strong>${name}</strong> — received ${smsList.length} reminders with no return visit recorded.`);
+      }
+    });
+
+    // Opted out shortly after reminder
+    allCustomers.filter(c => c.opted_out).forEach(c => {
+      const evs    = (byId[c.id] || []);
+      const smsEv  = evs.find(e => e.event_type === 'sms_sent');
+      const optEv  = evs.find(e => e.event_type === 'opted_out');
+      if (smsEv && optEv) {
+        const hrs = (optEv.created_at - smsEv.created_at) / 3600000;
+        if (hrs >= 0 && hrs <= 48) {
+          flags.push(`<strong>${c.first_name || 'A customer'}</strong> — opted out within ${Math.round(hrs)} hours of a reminder. Consider reviewing message wording.`);
+        }
+      }
+    });
+
+    const section = document.getElementById('flags-section');
+    if (!flags.length) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+    document.getElementById('flags-list').innerHTML = flags.map(f =>
+      `<div class="flag"><div class="flag-icon">⚑</div><div class="flag-msg">${f}</div></div>`
+    ).join('');
+  }
+
+  // ── HELPERS ──────────────────────────────────────────────
+  function set(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+
+  function timeAgo(ts) {
+    const d = Date.now() - ts;
+    if (d < 60000)    return 'just now';
+    if (d < 3600000)  return Math.floor(d/60000) + 'm ago';
+    if (d < 86400000) return Math.floor(d/3600000) + 'h ago';
+    return Math.floor(d/86400000) + 'd ago';
+  }
+
+  function fmtDateTime(ts) {
+    return new Date(ts).toLocaleString('en-GB', {
+      day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
+    });
+  }
+
+  function fmtType(t) {
+    const m = { registered:'Registered', visit:'Visit check-in', sms_sent:'Reminder sent',
+                state_change:'State changed', opted_out:'Opted out', resubscribed:'Re-subscribed' };
+    return m[t] || t;
+  }
+
+  function dotColor(t) {
+    const m = { registered:'#60e090', visit:'#D4A843', sms_sent:'#60b8f0',
+                state_change:'#3a3a3a', opted_out:'#ff5c5c', resubscribed:'#60e090' };
+    return m[t] || '#555';
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+</script>
+</body>
+</html>
