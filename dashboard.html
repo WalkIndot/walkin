@@ -21,6 +21,7 @@
     --blue: #60b8f0;
     --green: #60e090;
     --grey: #666;
+    --gold: #C9A84C;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; min-height: 100vh; }
@@ -60,6 +61,24 @@
   .badge-lapsed      { background: #1a1a2a; color: var(--blue); }
   .badge-reminded    { background: #1f1f1f; color: var(--muted); }
   .badge-opted_out   { background: #222; color: #555; }
+
+  /* Notes panel */
+  .notes-row td { background: #141414; padding: 0; white-space: normal; }
+  .notes-panel { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .notes-panel-inner { display: flex; gap: 16px; align-items: flex-start; }
+  .notes-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; }
+  .notes-textarea { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 9px 10px; outline: none; transition: border-color 0.2s; width: 100%; min-height: 70px; resize: vertical; }
+  .notes-textarea:focus { border-color: var(--accent); }
+  .notes-save-btn { background: var(--accent); color: #0f0f0f; border: none; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 11px; padding: 8px 16px; cursor: pointer; white-space: nowrap; transition: background 0.2s; align-self: flex-end; }
+  .notes-save-btn:hover { background: var(--accent-dim); }
+  .notes-save-btn:disabled { background: #2a2a26; color: #555; cursor: not-allowed; }
+  .notes-status { font-size: 10px; margin-top: 6px; min-height: 14px; }
+  .notes-status.ok { color: var(--green); }
+  .notes-status.err { color: var(--red); }
+  .notes-toggle-btn { background: none; border: none; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; cursor: pointer; padding: 0 4px; text-decoration: underline; transition: color 0.15s; }
+  .notes-toggle-btn:hover { color: var(--accent); }
+  .has-notes { color: var(--gold); font-size: 10px; }
+
   .holiday-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
   @media (max-width: 700px) { .holiday-grid { grid-template-columns: 1fr; } }
   .card { background: var(--surface); border: 1px solid var(--border); padding: 24px; }
@@ -136,7 +155,7 @@
       <table id="customers-table" style="display:none">
         <thead>
           <tr>
-            <th>Name</th><th>Phone</th><th>Barber</th><th>Frequency</th><th>Last Visit</th><th>State</th><th>Opted Out</th>
+            <th>Name</th><th>Phone</th><th>Barber</th><th>Frequency</th><th>Last Visit</th><th>State</th><th>Opted Out</th><th>Notes</th>
           </tr>
         </thead>
         <tbody id="customers-tbody"></tbody>
@@ -356,7 +375,7 @@
       document.getElementById('customers-table').style.display = 'table';
       if (!Array.isArray(customers) || customers.length === 0) {
         document.getElementById('customers-tbody').innerHTML =
-          '<tr><td colspan="7" class="td-muted">No customers yet.</td></tr>';
+          '<tr><td colspan="8" class="td-muted">No customers yet.</td></tr>';
         return;
       }
       document.getElementById('customer-count').textContent = customers.length + ' registered';
@@ -367,6 +386,8 @@
           : '—';
         const state = c.opted_out ? 'opted_out' : (c.reminder_state || 'not_due');
         const stateLabel = state.replace('_', ' ');
+        const hasNotes = c.notes && c.notes.trim().length > 0;
+        const notesPreview = hasNotes ? c.notes.trim().substring(0, 40) + (c.notes.trim().length > 40 ? '...' : '') : '';
         return `<tr>
           <td>${esc(c.first_name || '—')}</td>
           <td class="td-muted">${esc(c.phone || '—')}</td>
@@ -375,11 +396,74 @@
           <td class="td-muted">${lastVisit}</td>
           <td><span class="badge badge-${state}">${stateLabel}</span></td>
           <td class="td-muted">${c.opted_out ? 'Yes' : '—'}</td>
+          <td><button class="notes-toggle-btn" onclick="toggleNotes('${esc(c.phone)}', this)">${hasNotes ? '<span class="has-notes">&#9679; edit</span>' : 'add'}</button></td>
+        </tr>
+        <tr class="notes-row" id="notes-row-${esc(c.phone)}" style="display:none">
+          <td colspan="8">
+            <div class="notes-panel">
+              <div class="notes-label">Notes for ${esc(c.first_name || c.phone)}</div>
+              <div class="notes-panel-inner">
+                <div style="flex:1">
+                  <textarea class="notes-textarea" id="notes-ta-${esc(c.phone)}" placeholder="e.g. skin fade, scissor finish on top, Leeds United fan, coming 18 months...">${esc(c.notes || '')}</textarea>
+                  <div class="notes-status" id="notes-status-${esc(c.phone)}"></div>
+                </div>
+                <button class="notes-save-btn" onclick="saveNotes('${esc(c.phone)}')">Save</button>
+              </div>
+            </div>
+          </td>
         </tr>`;
       }).join('');
     } catch(e) {
       document.getElementById('customers-loading').innerHTML =
         '<span style="color:var(--red)">Failed to load customers.</span>';
+    }
+  }
+
+  function toggleNotes(phone, btn) {
+    const row = document.getElementById('notes-row-' + phone);
+    if (!row) return;
+    const isVisible = row.style.display !== 'none';
+    row.style.display = isVisible ? 'none' : 'table-row';
+    if (!isVisible) {
+      const ta = document.getElementById('notes-ta-' + phone);
+      if (ta) ta.focus();
+    }
+  }
+
+  async function saveNotes(phone) {
+    const ta = document.getElementById('notes-ta-' + phone);
+    const status = document.getElementById('notes-status-' + phone);
+    const btn = ta ? ta.closest('.notes-panel').querySelector('.notes-save-btn') : null;
+    if (!ta || !status) return;
+
+    const notes = ta.value.trim();
+    status.className = 'notes-status';
+    status.textContent = '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+    try {
+      const res = await fetch(BASE + '/customer/update_notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone, notes: notes || null })
+      });
+      if (!res.ok) throw new Error();
+      status.textContent = 'Saved.';
+      status.className = 'notes-status ok';
+      // Update the toggle button to reflect notes state
+      const row = document.getElementById('notes-row-' + phone);
+      if (row && row.previousElementSibling) {
+        const toggleBtn = row.previousElementSibling.querySelector('.notes-toggle-btn');
+        if (toggleBtn) {
+          toggleBtn.innerHTML = notes ? '<span class="has-notes">&#9679; edit</span>' : 'add';
+        }
+      }
+      setTimeout(() => { status.textContent = ''; status.className = 'notes-status'; }, 3000);
+    } catch(e) {
+      status.textContent = 'Failed to save.';
+      status.className = 'notes-status err';
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Save'; }
     }
   }
 
@@ -528,48 +612,29 @@
   }
 
   async function addCustomerManually() {
-    const firstName     = document.getElementById('mc-firstname').value.trim();
-    const lastName      = document.getElementById('mc-lastname').value.trim();
-    const phone         = document.getElementById('mc-phone').value.trim().replace(/\s/g, '');
+    const firstName      = document.getElementById('mc-firstname').value.trim();
+    const lastName       = document.getElementById('mc-lastname').value.trim();
+    const phone          = document.getElementById('mc-phone').value.trim().replace(/\s/g, '');
     const frequencyWeeks = parseInt(document.getElementById('mc-frequency').value);
-    const lastVisitDate = document.getElementById('mc-lastvisit').value;
-    const msg           = document.getElementById('mc-msg');
+    const lastVisitDate  = document.getElementById('mc-lastvisit').value;
+    const msg            = document.getElementById('mc-msg');
     msg.className = 'form-msg';
 
-    // Validation
-    if (!firstName) {
-      msg.textContent = 'Please enter a first name.';
-      msg.className = 'form-msg err'; return;
-    }
-    if (!phone || phone.length < 10) {
-      msg.textContent = 'Please enter a valid mobile number.';
-      msg.className = 'form-msg err'; return;
-    }
-    if (!frequencyWeeks) {
-      msg.textContent = 'Please select a haircut frequency.';
-      msg.className = 'form-msg err'; return;
-    }
-    if (!shopId || !barberId) {
-      msg.textContent = 'Session error — please sign out and sign back in.';
-      msg.className = 'form-msg err'; return;
-    }
+    if (!firstName) { msg.textContent = 'Please enter a first name.'; msg.className = 'form-msg err'; return; }
+    if (!phone || phone.length < 10) { msg.textContent = 'Please enter a valid mobile number.'; msg.className = 'form-msg err'; return; }
+    if (!frequencyWeeks) { msg.textContent = 'Please select a haircut frequency.'; msg.className = 'form-msg err'; return; }
+    if (!shopId || !barberId) { msg.textContent = 'Session error — please sign out and sign back in.'; msg.className = 'form-msg err'; return; }
 
     const btn = document.querySelector('[onclick="addCustomerManually()"]');
-    btn.disabled = true;
-    btn.textContent = 'Adding...';
+    btn.disabled = true; btn.textContent = 'Adding...';
 
     try {
-      // Step 1 — Register the customer
       const regRes = await fetch(BASE + '/customer/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          first_name:              firstName,
-          last_name:               lastName || null,
-          phone:                   phone,
-          shop_id:                 shopId,
-          barber_id:               barberId,
-          haircut_frequency_weeks: frequencyWeeks,
+          first_name: firstName, last_name: lastName || null, phone: phone,
+          shop_id: shopId, barber_id: barberId, haircut_frequency_weeks: frequencyWeeks,
           source: 'manual_dashboard'
         })
       });
@@ -588,58 +653,45 @@
       const newCustomer = await regRes.json();
       const customerId  = newCustomer.id || null;
 
-      // Step 2 — Log a visit if a last visit date was provided
       if (lastVisitDate) {
         await fetch(BASE + '/visit/checkin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            phone:     phone,
-            shop_id:   shopId,
-            barber_id: barberId,
-            visited_at: new Date(lastVisitDate).getTime()
-          })
+          body: JSON.stringify({ phone: phone, shop_id: shopId, barber_id: barberId, visited_at: new Date(lastVisitDate).getTime() })
         }).catch(() => {});
       }
 
-      // Step 3 — Log the event
       fetch(BASE + '/customer/log_event', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customer_id:               customerId,
-          customer_name:             firstName,
-          event_type:                'registered',
-          event_detail:              'Customer added manually by barber via dashboard. Frequency: every ' + frequencyWeeks + ' week(s).' + (lastVisitDate ? ' Last visit date provided: ' + lastVisitDate + '.' : ' No last visit date provided — will be treated as due.'),
-          reminder_state_at_event:   'not_due',
-          days_since_last_visit:     lastVisitDate ? Math.floor((Date.now() - new Date(lastVisitDate).getTime()) / (1000 * 60 * 60 * 24)) : 0,
+          customer_id: customerId, customer_name: firstName, event_type: 'registered',
+          event_detail: 'Customer added manually by barber via dashboard. Frequency: every ' + frequencyWeeks + ' week(s).' + (lastVisitDate ? ' Last visit date provided: ' + lastVisitDate + '.' : ' No last visit date provided.'),
+          reminder_state_at_event: 'not_due', days_since_last_visit: lastVisitDate ? Math.floor((Date.now() - new Date(lastVisitDate).getTime()) / (1000 * 60 * 60 * 24)) : 0,
           visit_was_reminder_driven: false
         })
       }).catch(() => {});
 
-      // Step 4 — Clear form and reload customer table
-      document.getElementById('mc-firstname').value  = '';
-      document.getElementById('mc-lastname').value   = '';
-      document.getElementById('mc-phone').value      = '';
-      document.getElementById('mc-frequency').value  = '';
-      document.getElementById('mc-lastvisit').value  = '';
+      document.getElementById('mc-firstname').value = '';
+      document.getElementById('mc-lastname').value  = '';
+      document.getElementById('mc-phone').value     = '';
+      document.getElementById('mc-frequency').value = '';
+      document.getElementById('mc-lastvisit').value = '';
 
-      msg.textContent = firstName + ' added successfully. They\'ll appear in the customer table now.';
+      msg.textContent = firstName + ' added successfully.';
       msg.className = 'form-msg ok';
-
       loadCustomers();
 
     } catch(e) {
       msg.textContent = 'Something went wrong. Please try again.';
       msg.className = 'form-msg err';
     } finally {
-      btn.disabled = false;
-      btn.textContent = 'Add Customer';
+      btn.disabled = false; btn.textContent = 'Add Customer';
     }
   }
-  
+
   function esc(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
 
   function formatDate(ts) {
