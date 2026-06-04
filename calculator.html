@@ -530,12 +530,10 @@ A barber is looking at these drift calculator results:
 Give a concise, practical 4-5 step guide on exactly how to present these specific numbers to a barber who is considering switching to an appointment system. Be direct, conversational and specific to these numbers. Use the phrase "appointments without the appointments" naturally. Format as numbered steps with a short closing line. Keep it under 250 words.`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://walkin-ai-proxy.raks.workers.dev/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
