@@ -418,7 +418,7 @@
   <!-- INSIGHT -->
   <div class="insight" id="insight-box">
     With <strong id="i-regulars">80</strong> regulars drifting from every <strong id="i-normal">3</strong> weeks to every <strong id="i-drifted">5</strong> weeks — at <strong id="i-price">£20</strong> a cut — you lose <strong id="i-lost">£11,093</strong> a year. Not from losing a single customer. Just drift.<br><br>
-    WalkIn. costs £39/month. At your numbers the payback takes <span class="payback" id="i-payback">13 days</span>.
+    WalkIn. costs £25/month. At your numbers the payback takes <span class="payback" id="i-payback">13 days</span>.
   </div>
 
   <!-- AI SECTION -->
@@ -467,7 +467,7 @@ function calc() {
   const revDrft    = regulars * visitsDrft * price;
   const lost       = revNorm - revDrft;
   const pct        = Math.round((revDrft / revNorm) * 100);
-  const payback    = Math.max(1, Math.round(39 / (lost / 365)));
+  const payback    = Math.max(1, Math.round(25 / (lost / 365)));
 
   document.getElementById('v-regulars').textContent = regulars;
   document.getElementById('v-price').textContent    = '£' + price;
@@ -517,7 +517,7 @@ async function askAI() {
   resp.innerHTML = '';
   resp.classList.add('visible');
 
-  const prompt = `You are a sales coach for WalkIn., a walk-in barber retention product costing £39/month.
+  const prompt = `You are a sales coach for WalkIn., a walk-in barber retention product costing £25/month.
 
 A barber is looking at these drift calculator results:
 - Regulars: ${d.regulars}
@@ -538,9 +538,13 @@ Give a concise, practical 4-5 step guide on exactly how to present these specifi
       })
     });
 
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+
     const data = await response.json();
 
-    if (data.error) throw new Error(data.error.message);
+    if (data.error) throw new Error(typeof data.error === 'object' ? data.error.message : String(data.error));
+
+    if (!data.content || !data.content.length) throw new Error('Empty: ' + JSON.stringify(data).slice(0,200));
 
     const text = data.content.map(b => b.text || '').join('').trim();
 
@@ -552,7 +556,7 @@ Give a concise, practical 4-5 step guide on exactly how to present these specifi
     btn.textContent = 'Recalculate advice for new numbers';
 
   } catch (err) {
-    resp.innerHTML = '<div class="ai-error">Could not connect to AI. Check your internet connection and try again.</div>';
+    resp.innerHTML = '<div class="ai-error">' + (err.message || 'Unknown error') + '</div>';
     btn.disabled = false;
     btn.textContent = 'Try again';
   }
