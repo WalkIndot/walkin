@@ -7,113 +7,149 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface2: #222222;
-    --border: #2e2e2e;
-    --text: #f0ede8;
-    --muted: #888;
-    --accent: #c8f060;
-    --accent-dim: #a0c040;
-    --red: #ff5c5c;
-    --orange: #ff9a3c;
-    --yellow: #ffd460;
-    --blue: #60b8f0;
-    --green: #60e090;
-    --grey: #666;
-    --gold: #C9A84C;
+    --bg:         #0C0C0A;
+    --surface:    #1A1A16;
+    --surface2:   #222220;
+    --border:     #2C2C28;
+    --text:       #F5F0E6;
+    --muted:      #7A7468;
+    --muted2:     #3a3a36;
+    --accent:     #C9A84C;
+    --accent-dim: #8A6B28;
+    --accent-glow:rgba(201,168,76,0.10);
+    --red:        #B85C38;
+    --orange:     #C97A3C;
+    --yellow:     #D4A843;
+    --blue:       #60b8f0;
+    --green:      #2E8B4A;
   }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; min-height: 100vh; }
-  #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); }
-  .login-box { width: 360px; padding: 48px 40px; border: 1px solid var(--border); background: var(--surface); }
-  .login-wordmark { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -1px; color: var(--accent); margin-bottom: 8px; }
-  .login-sub { color: var(--muted); font-size: 12px; margin-bottom: 36px; }
-  .login-box label { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-  .login-box input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; padding: 10px 12px; margin-bottom: 20px; outline: none; transition: border-color 0.2s; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; min-height: 100vh; }
+
+  /* ── LOGIN ──────────────────────────────────────────── */
+  #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .login-box { width: 360px; padding: 48px 40px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); position: relative; }
+  .login-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); border-radius: 12px 12px 0 0; }
+  .login-wordmark { display: flex; align-items: baseline; gap: 1px; margin-bottom: 4px; }
+  .login-wordmark-text { font-family: Georgia, serif; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+  .login-wordmark-dot  { font-family: Georgia, serif; font-size: 28px; font-weight: 700; color: var(--accent); }
+  .login-sub { color: var(--muted); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 36px; }
+  .login-box label { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 7px; }
+  .login-box input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; padding: 10px 12px; margin-bottom: 20px; outline: none; transition: border-color 0.2s; }
   .login-box input:focus { border-color: var(--accent); }
-  .login-btn { width: 100%; background: var(--accent); color: #0f0f0f; border: none; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; padding: 12px; cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s; }
+  .login-btn { width: 100%; background: var(--accent); color: #0C0C0A; border: none; border-radius: 6px; font-family: Georgia, serif; font-weight: 700; font-size: 13px; padding: 12px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: background 0.2s; }
   .login-btn:hover { background: var(--accent-dim); }
-  .login-error { color: var(--red); font-size: 12px; margin-top: 12px; display: none; }
+  .login-error { color: var(--red); font-size: 11px; margin-top: 12px; display: none; }
+
+  /* ── LAYOUT ──────────────────────────────────────────── */
   #dashboard { display: none; }
-  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; border-bottom: 1px solid var(--border); background: var(--surface); }
-  .wordmark { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 2px solid var(--accent); background: var(--bg); position: sticky; top: 0; z-index: 100; }
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
+  .wordmark { display: flex; align-items: baseline; gap: 1px; }
+  .wordmark-text { font-family: Georgia, serif; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+  .wordmark-dot  { font-family: Georgia, serif; font-size: 20px; font-weight: 700; color: var(--accent); }
   .topbar-right { display: flex; align-items: center; gap: 20px; color: var(--muted); font-size: 12px; }
-  .logout-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 12px; cursor: pointer; transition: all 0.2s; }
+  .logout-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; padding: 5px 12px; cursor: pointer; transition: all 0.2s; }
   .logout-btn:hover { border-color: var(--red); color: var(--red); }
   .main { padding: 32px; max-width: 1200px; margin: 0 auto; }
-  .section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; }
-  .section-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); }
+
+  /* ── SECTION HEADERS ─────────────────────────────────── */
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; margin-top: 48px; }
+  .section-header:first-of-type { margin-top: 0; }
+  .section-title { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); white-space: nowrap; }
   .section-count { font-size: 11px; color: var(--muted); }
-  .table-wrap { border: 1px solid var(--border); overflow-x: auto; margin-bottom: 48px; }
+  .section-rule { flex: 1; height: 1px; background: var(--border); }
+
+  /* ── CUSTOMERS TABLE ─────────────────────────────────── */
+  .table-wrap { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 0; }
   table { width: 100%; border-collapse: collapse; }
-  thead th { background: var(--surface); color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  thead th { background: var(--surface); color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
   tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: var(--surface2); }
   td { padding: 12px 16px; color: var(--text); white-space: nowrap; }
   .td-muted { color: var(--muted); }
-  .badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 3px 8px; letter-spacing: 0.5px; text-transform: uppercase; }
-  .badge-not_due     { background: #1a2a1a; color: var(--green); }
-  .badge-due_soon    { background: #2a2a1a; color: var(--yellow); }
-  .badge-due         { background: #2a1f1a; color: var(--orange); }
-  .badge-overdue     { background: #2a1a1a; color: var(--red); }
-  .badge-lapsed      { background: #1a1a2a; color: var(--blue); }
-  .badge-reminded    { background: #1f1f1f; color: var(--muted); }
-  .badge-opted_out   { background: #222; color: #555; }
+  .badge { display: inline-block; font-size: 9px; font-weight: 500; padding: 2px 7px; letter-spacing: 0.5px; text-transform: uppercase; border-radius: 4px; }
+  .badge-not_due   { background: rgba(46,139,74,0.15);  color: var(--green); }
+  .badge-due_soon  { background: rgba(212,168,67,0.12); color: var(--yellow); }
+  .badge-due       { background: rgba(201,122,60,0.15); color: var(--orange); }
+  .badge-overdue   { background: rgba(184,92,56,0.15);  color: var(--red); }
+  .badge-lapsed    { background: rgba(96,184,240,0.10); color: var(--blue); }
+  .badge-reminded  { background: rgba(122,116,104,0.15); color: var(--muted); }
+  .badge-opted_out { background: rgba(58,58,54,0.3);    color: #555; }
 
-  /* Notes panel */
-  .notes-row td { background: #141414; padding: 0; white-space: normal; }
+  /* ── NOTES ───────────────────────────────────────────── */
+  .notes-row td { background: #141412; padding: 0; white-space: normal; }
   .notes-panel { padding: 16px 20px; border-top: 1px solid var(--border); }
   .notes-panel-inner { display: flex; gap: 16px; align-items: flex-start; }
-  .notes-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; }
-  .notes-textarea { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 9px 10px; outline: none; transition: border-color 0.2s; width: 100%; min-height: 70px; resize: vertical; }
+  .notes-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+  .notes-textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 9px 10px; outline: none; transition: border-color 0.2s; width: 100%; min-height: 70px; resize: vertical; }
   .notes-textarea:focus { border-color: var(--accent); }
-  .notes-save-btn { background: var(--accent); color: #0f0f0f; border: none; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 11px; padding: 8px 16px; cursor: pointer; white-space: nowrap; transition: background 0.2s; align-self: flex-end; }
+  .notes-save-btn { background: var(--accent); color: #0C0C0A; border: none; border-radius: 6px; font-family: Georgia, serif; font-weight: 700; font-size: 11px; padding: 8px 16px; cursor: pointer; white-space: nowrap; transition: background 0.2s; align-self: flex-end; }
   .notes-save-btn:hover { background: var(--accent-dim); }
   .notes-save-btn:disabled { background: #2a2a26; color: #555; cursor: not-allowed; }
   .notes-status { font-size: 10px; margin-top: 6px; min-height: 14px; }
-  .notes-status.ok { color: var(--green); }
+  .notes-status.ok  { color: var(--green); }
   .notes-status.err { color: var(--red); }
   .notes-toggle-btn { background: none; border: none; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; cursor: pointer; padding: 0 4px; text-decoration: underline; transition: color 0.15s; }
   .notes-toggle-btn:hover { color: var(--accent); }
-  .has-notes { color: var(--gold); font-size: 10px; }
+  .has-notes { color: var(--accent); font-size: 10px; }
 
-  .holiday-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  @media (max-width: 700px) { .holiday-grid { grid-template-columns: 1fr; } }
-  .card { background: var(--surface); border: 1px solid var(--border); padding: 24px; }
-  .card-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 20px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  /* ── CARDS ───────────────────────────────────────────── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+  .card-title { font-size: 0.68rem; letter-spacing: 0.15em; font-weight: 600; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+
+  /* ── FORMS ───────────────────────────────────────────── */
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
-  .form-group label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
-  .form-group input, .form-group textarea, .form-group select { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 9px 10px; outline: none; transition: border-color 0.2s; width: 100%; }
-  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
+  .form-group label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+  .form-group input,
+  .form-group textarea,
+  .form-group select { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 9px 10px; outline: none; transition: border-color 0.2s; width: 100%; }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus { border-color: var(--accent); }
   .form-group select option { background: var(--bg); }
   .form-group textarea { resize: vertical; min-height: 60px; }
   .form-full { grid-column: 1 / -1; }
-  .submit-btn { background: var(--accent); color: #0f0f0f; border: none; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; padding: 10px 20px; cursor: pointer; margin-top: 8px; transition: background 0.2s; letter-spacing: 0.5px; }
+  .submit-btn { background: var(--accent); color: #0C0C0A; border: none; border-radius: 6px; font-family: Georgia, serif; font-weight: 700; font-size: 12px; padding: 10px 20px; cursor: pointer; margin-top: 8px; transition: background 0.2s; letter-spacing: 0.5px; }
   .submit-btn:hover { background: var(--accent-dim); }
+  .submit-btn:disabled { background: #2a2a26; color: #555; cursor: not-allowed; }
   .form-msg { font-size: 11px; margin-top: 10px; display: none; }
-  .form-msg.ok { color: var(--green); display: block; }
+  .form-msg.ok  { color: var(--green); display: block; }
   .form-msg.err { color: var(--red); display: block; }
+  .settings-note { font-size: 11px; color: var(--muted); margin-bottom: 16px; line-height: 1.7; }
+
+  /* ── AWAY PERIODS ────────────────────────────────────── */
   .holiday-list { display: flex; flex-direction: column; gap: 10px; }
-  .holiday-item { display: flex; align-items: flex-start; justify-content: space-between; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); gap: 12px; }
+  .holiday-item { display: flex; align-items: flex-start; justify-content: space-between; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; gap: 12px; }
   .holiday-dates { font-size: 12px; color: var(--text); margin-bottom: 3px; }
-  .holiday-note { font-size: 11px; color: var(--muted); }
-  .delete-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; padding: 4px 10px; cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; }
+  .holiday-note  { font-size: 11px; color: var(--muted); }
+  .delete-btn { background: none; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; padding: 4px 10px; cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; }
   .delete-btn:hover { border-color: var(--red); color: var(--red); }
   .empty-state { color: var(--muted); font-size: 12px; padding: 16px 0; }
-  .loading { color: var(--muted); font-size: 12px; padding: 24px 0; }
-  .spinner { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 48px; }
-  @media (max-width: 700px) { .settings-grid { grid-template-columns: 1fr; } }
+
+  /* ── WORKING DAYS ────────────────────────────────────── */
   .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px; }
   .day-toggle { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
   .day-toggle input[type="checkbox"] { display: none; }
-  .day-box { width: 100%; padding: 8px 4px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.15s; cursor: pointer; }
-  .day-toggle input:checked + .day-box { border-color: var(--accent); background: #1a2200; color: var(--accent); }
-  .settings-note { font-size: 10px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  .day-box { width: 100%; padding: 8px 4px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.15s; cursor: pointer; }
+  .day-toggle input:checked + .day-box { border-color: var(--accent); background: rgba(201,168,76,0.08); color: var(--accent); }
+
+  /* ── HOW IT WORKS LIST ───────────────────────────────── */
+  .how-it-works { display: flex; flex-direction: column; gap: 10px; }
+  .how-item { display: flex; gap: 10px; align-items: flex-start; font-size: 11px; color: var(--muted); line-height: 1.6; }
+  .how-item::before { content: '—'; color: var(--accent); flex-shrink: 0; }
+
+  /* ── LOADING ─────────────────────────────────────────── */
+  .loading { color: var(--muted); font-size: 12px; padding: 24px 0; }
+  .spinner { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .bottom-spacer { height: 56px; }
 </style>
 </head>
 <body>
@@ -121,7 +157,9 @@
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-wordmark">WalkIn.</div>
+    <div class="login-wordmark">
+      <span class="login-wordmark-text">WalkIn</span><span class="login-wordmark-dot">.</span>
+    </div>
     <div class="login-sub">Barber Dashboard</div>
     <label for="l-email">Email</label>
     <input type="email" id="l-email" placeholder="your@email.com" autocomplete="username">
@@ -135,18 +173,24 @@
 <!-- DASHBOARD -->
 <div id="dashboard">
   <div class="topbar">
-    <div class="wordmark">WalkIn.</div>
+    <div class="topbar-left">
+      <div class="wordmark">
+        <span class="wordmark-text">WalkIn</span><span class="wordmark-dot">.</span>
+      </div>
+    </div>
     <div class="topbar-right">
       <span id="topbar-name"></span>
       <button class="logout-btn" onclick="doLogout()">Sign out</button>
     </div>
   </div>
+
   <div class="main">
 
-    <!-- CUSTOMERS -->
-    <div class="section-header">
+    <!-- ── CUSTOMERS ──────────────────────────────────── -->
+    <div class="section-header" style="margin-top:0">
       <span class="section-title">Customers</span>
       <span class="section-count" id="customer-count"></span>
+      <div class="section-rule"></div>
     </div>
     <div class="table-wrap">
       <div class="loading" id="customers-loading" style="padding:20px 16px">
@@ -162,11 +206,12 @@
       </table>
     </div>
 
-    <!-- AWAY PERIODS -->
+    <!-- ── AWAY PERIODS ───────────────────────────────── -->
     <div class="section-header">
       <span class="section-title">Away Periods</span>
+      <div class="section-rule"></div>
     </div>
-    <div class="holiday-grid" style="margin-bottom:48px">
+    <div class="two-col">
       <div class="card">
         <div class="card-title">Add Away Period</div>
         <div class="form-row">
@@ -196,56 +241,12 @@
       </div>
     </div>
 
-    <!-- SHOP SETTINGS -->
-    <div class="section-header">
-      <span class="section-title">Shop Settings</span>
-    </div>
-    <div class="settings-grid">
-      <div class="card">
-        <div class="card-title">Working Days</div>
-        <div class="settings-note">Tick the days your shop is open. Reminders will only be sent on working days, and return dates in holiday messages will reflect your schedule.</div>
-        <div class="days-grid">
-          <label class="day-toggle"><input type="checkbox" id="day-1" value="1"><span class="day-box">Mon</span></label>
-          <label class="day-toggle"><input type="checkbox" id="day-2" value="2"><span class="day-box">Tue</span></label>
-          <label class="day-toggle"><input type="checkbox" id="day-3" value="3"><span class="day-box">Wed</span></label>
-          <label class="day-toggle"><input type="checkbox" id="day-4" value="4"><span class="day-box">Thu</span></label>
-          <label class="day-toggle"><input type="checkbox" id="day-5" value="5"><span class="day-box">Fri</span></label>
-          <label class="day-toggle"><input type="checkbox" id="day-6" value="6"><span class="day-box">Sat</span></label>
-          <label class="day-toggle"><input type="checkbox" id="day-7" value="7"><span class="day-box">Sun</span></label>
-        </div>
-        <button class="submit-btn" onclick="saveWorkingDays()">Save Working Days</button>
-        <div class="form-msg" id="working-days-msg"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Reminder Send Time</div>
-        <div class="settings-note">Set the hour of day when reminder messages are sent to customers. Default is 10am. Changes take effect from the next scheduled send.</div>
-        <div class="form-group" style="margin-bottom:16px">
-          <label>Send Hour</label>
-          <select id="reminder-send-hour">
-            <option value="7">7am</option>
-            <option value="8">8am</option>
-            <option value="9">9am</option>
-            <option value="10" selected>10am</option>
-            <option value="11">11am</option>
-            <option value="12">12pm (noon)</option>
-            <option value="13">1pm</option>
-            <option value="14">2pm</option>
-            <option value="15">3pm</option>
-            <option value="16">4pm</option>
-            <option value="17">5pm</option>
-            <option value="18">6pm</option>
-          </select>
-        </div>
-        <button class="submit-btn" onclick="saveReminderHour()">Save Send Time</button>
-        <div class="form-msg" id="reminder-hour-msg"></div>
-      </div>
-    </div>
-
-  <!-- ADD CUSTOMER MANUALLY -->
+    <!-- ── ADD CUSTOMER ───────────────────────────────── -->
     <div class="section-header">
       <span class="section-title">Add Customer</span>
+      <div class="section-rule"></div>
     </div>
-    <div class="settings-grid" style="margin-bottom:48px">
+    <div class="two-col">
       <div class="card">
         <div class="card-title">Manual Registration</div>
         <div class="settings-note">Add an existing regular directly — no QR scan needed. They'll enter the reminder cycle immediately.</div>
@@ -289,24 +290,48 @@
       </div>
       <div class="card">
         <div class="card-title">How This Works</div>
-        <div class="settings-note" style="line-height:2">
-          — Customer is registered directly into WalkIn.<br>
-          — If you enter their last visit date, the reminder engine will calculate where they are in their cycle immediately.<br>
-          — If no last visit date is entered, they'll be treated as due and receive a reminder on the next send.<br>
-          — They'll receive a message from you when they're due — same as any QR-registered customer.<br>
-          — You can always remove a customer by contacting support.
+        <div class="how-it-works">
+          <div class="how-item">Customer is registered directly into WalkIn. — no QR scan needed.</div>
+          <div class="how-item">If you enter their last visit date, the reminder engine calculates where they are in their cycle immediately.</div>
+          <div class="how-item">If no last visit date is entered, they'll be treated as due and receive a reminder on the next send.</div>
+          <div class="how-item">They'll receive messages the same way as any QR-registered customer.</div>
+          <div class="how-item">To remove a customer, contact support.</div>
         </div>
       </div>
-    </div></div>
+    </div>
+
+    <!-- ── SETTINGS ───────────────────────────────────── -->
+    <div class="section-header">
+      <span class="section-title">Settings</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="card" style="max-width:520px">
+      <div class="card-title">Working Days</div>
+      <div class="settings-note">Tick the days your shop is open. Reminders will only be sent on working days, and return dates in holiday messages will reflect your schedule.</div>
+      <div class="days-grid">
+        <label class="day-toggle"><input type="checkbox" id="day-1" value="1"><span class="day-box">Mon</span></label>
+        <label class="day-toggle"><input type="checkbox" id="day-2" value="2"><span class="day-box">Tue</span></label>
+        <label class="day-toggle"><input type="checkbox" id="day-3" value="3"><span class="day-box">Wed</span></label>
+        <label class="day-toggle"><input type="checkbox" id="day-4" value="4"><span class="day-box">Thu</span></label>
+        <label class="day-toggle"><input type="checkbox" id="day-5" value="5"><span class="day-box">Fri</span></label>
+        <label class="day-toggle"><input type="checkbox" id="day-6" value="6"><span class="day-box">Sat</span></label>
+        <label class="day-toggle"><input type="checkbox" id="day-7" value="7"><span class="day-box">Sun</span></label>
+      </div>
+      <button class="submit-btn" onclick="saveWorkingDays()">Save Working Days</button>
+      <div class="form-msg" id="working-days-msg"></div>
+    </div>
+
+    <div class="bottom-spacer"></div>
+  </div>
 </div>
 
 <script>
-  const BASE = 'https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm';
+  const BASE    = 'https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm';
   const BARBERS = { 1: 'Nick' };
   const API_KEY = 'walkin-svc-2026-x9k3mq';
   let authToken = sessionStorage.getItem('walkin_token') || null;
-  let barberId = parseInt(sessionStorage.getItem('walkin_barber_id')) || null;
-  let shopId = parseInt(sessionStorage.getItem('walkin_shop_id')) || null;
+  let barberId  = parseInt(sessionStorage.getItem('walkin_barber_id')) || null;
+  let shopId    = parseInt(sessionStorage.getItem('walkin_shop_id')) || null;
 
   if (authToken) showDashboard();
 
@@ -316,10 +341,10 @@
     const errEl = document.getElementById('login-error');
     errEl.style.display = 'none';
     try {
-      const res = await fetch(BASE + '/auth/login', {
+      const res  = await fetch(BASE + '/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, password: pass })
+        body: JSON.stringify({ email, password: pass })
       });
       const data = await res.json();
       if (!res.ok || !data.authToken) { errEl.style.display = 'block'; return; }
@@ -332,9 +357,9 @@
         const me = await meRes.json();
         if (me.barber) {
           barberId = me.barber.id;
-          shopId = me.barber.shop_id;
+          shopId   = me.barber.shop_id;
           sessionStorage.setItem('walkin_barber_id', barberId);
-          sessionStorage.setItem('walkin_shop_id', shopId);
+          sessionStorage.setItem('walkin_shop_id',   shopId);
           sessionStorage.setItem('walkin_barber_name', me.barber.name || '');
           document.getElementById('topbar-name').textContent = me.barber.name || '';
         }
@@ -358,7 +383,7 @@
 
   function showDashboard() {
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('dashboard').style.display   = 'block';
     const name = sessionStorage.getItem('walkin_barber_name') || '';
     if (name) document.getElementById('topbar-name').textContent = name;
     loadCustomers();
@@ -366,28 +391,27 @@
     loadShopSettings();
   }
 
+  // ── CUSTOMERS ─────────────────────────────────────────
   async function loadCustomers() {
     try {
       const res = await fetch(BASE + '/customer/all', { headers: { 'X-Api-Key': API_KEY } });
       if (res.status === 401) { doLogout(); return; }
       const customers = await res.json();
       document.getElementById('customers-loading').style.display = 'none';
-      document.getElementById('customers-table').style.display = 'table';
+      document.getElementById('customers-table').style.display   = 'table';
       if (!Array.isArray(customers) || customers.length === 0) {
         document.getElementById('customers-tbody').innerHTML =
           '<tr><td colspan="8" class="td-muted">No customers yet.</td></tr>';
         return;
       }
       document.getElementById('customer-count').textContent = customers.length + ' registered';
-      const tbody = document.getElementById('customers-tbody');
-      tbody.innerHTML = customers.map(c => {
+      document.getElementById('customers-tbody').innerHTML = customers.map(c => {
         const lastVisit = c.last_visit_at
           ? new Date(c.last_visit_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
           : '—';
-        const state = c.opted_out ? 'opted_out' : (c.reminder_state || 'not_due');
+        const state      = c.opted_out ? 'opted_out' : (c.reminder_state || 'not_due');
         const stateLabel = state.replace('_', ' ');
-        const hasNotes = c.notes && c.notes.trim().length > 0;
-        const notesPreview = hasNotes ? c.notes.trim().substring(0, 40) + (c.notes.trim().length > 40 ? '...' : '') : '';
+        const hasNotes   = c.notes && c.notes.trim().length > 0;
         return `<tr>
           <td>${esc(c.first_name || '—')}</td>
           <td class="td-muted">${esc(c.phone || '—')}</td>
@@ -404,7 +428,7 @@
               <div class="notes-label">Notes for ${esc(c.first_name || c.phone)}</div>
               <div class="notes-panel-inner">
                 <div style="flex:1">
-                  <textarea class="notes-textarea" id="notes-ta-${esc(c.phone)}" placeholder="e.g. skin fade, scissor finish on top, Leeds United fan, coming 18 months...">${esc(c.notes || '')}</textarea>
+                  <textarea class="notes-textarea" id="notes-ta-${esc(c.phone)}" placeholder="e.g. skin fade, scissor finish on top, Leeds United fan...">${esc(c.notes || '')}</textarea>
                   <div class="notes-status" id="notes-status-${esc(c.phone)}"></div>
                 </div>
                 <button class="notes-save-btn" onclick="saveNotes('${esc(c.phone)}')">Save</button>
@@ -431,32 +455,27 @@
   }
 
   async function saveNotes(phone) {
-    const ta = document.getElementById('notes-ta-' + phone);
+    const ta     = document.getElementById('notes-ta-' + phone);
     const status = document.getElementById('notes-status-' + phone);
-    const btn = ta ? ta.closest('.notes-panel').querySelector('.notes-save-btn') : null;
+    const btn    = ta ? ta.closest('.notes-panel').querySelector('.notes-save-btn') : null;
     if (!ta || !status) return;
-
     const notes = ta.value.trim();
     status.className = 'notes-status';
     status.textContent = '';
     if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
-
     try {
       const res = await fetch(BASE + '/customer/update_notes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phone, notes: notes || null })
+        body: JSON.stringify({ phone, notes: notes || null })
       });
       if (!res.ok) throw new Error();
       status.textContent = 'Saved.';
       status.className = 'notes-status ok';
-      // Update the toggle button to reflect notes state
       const row = document.getElementById('notes-row-' + phone);
       if (row && row.previousElementSibling) {
         const toggleBtn = row.previousElementSibling.querySelector('.notes-toggle-btn');
-        if (toggleBtn) {
-          toggleBtn.innerHTML = notes ? '<span class="has-notes">&#9679; edit</span>' : 'add';
-        }
+        if (toggleBtn) toggleBtn.innerHTML = notes ? '<span class="has-notes">&#9679; edit</span>' : 'add';
       }
       setTimeout(() => { status.textContent = ''; status.className = 'notes-status'; }, 3000);
     } catch(e) {
@@ -467,11 +486,12 @@
     }
   }
 
+  // ── AWAY PERIODS ──────────────────────────────────────
   async function loadHolidays() {
     try {
-      const res = await fetch(BASE + '/holidays');
+      const res      = await fetch(BASE + '/holidays');
       const holidays = await res.json();
-      const wrap = document.getElementById('holiday-list-wrap');
+      const wrap     = document.getElementById('holiday-list-wrap');
       if (!Array.isArray(holidays) || holidays.length === 0) {
         wrap.innerHTML = '<div class="empty-state">No upcoming away periods.</div>';
         return;
@@ -491,73 +511,6 @@
     } catch(e) {
       document.getElementById('holiday-list-wrap').innerHTML =
         '<div style="color:var(--red);font-size:12px">Failed to load away periods.</div>';
-    }
-  }
-
-  async function loadShopSettings() {
-    if (!shopId) return;
-    try {
-      const res = await fetch(BASE + '/shop/settings?shop_id=' + shopId);
-      if (!res.ok) return;
-      const shop = await res.json();
-      if (shop.working_days) {
-        const days = shop.working_days.split(',').map(d => d.trim());
-        days.forEach(d => {
-          const cb = document.getElementById('day-' + d);
-          if (cb) cb.checked = true;
-        });
-      }
-      if (shop.reminder_send_hour !== undefined && shop.reminder_send_hour !== null) {
-        document.getElementById('reminder-send-hour').value = shop.reminder_send_hour;
-      }
-    } catch(e) { console.warn('Could not load shop settings:', e); }
-  }
-
-  async function saveWorkingDays() {
-    if (!shopId) return;
-    const msg = document.getElementById('working-days-msg');
-    msg.className = 'form-msg';
-    const checked = [];
-    for (let i = 1; i <= 7; i++) {
-      const cb = document.getElementById('day-' + i);
-      if (cb && cb.checked) checked.push(i);
-    }
-    if (checked.length === 0) {
-      msg.textContent = 'Please select at least one working day.';
-      msg.className = 'form-msg err'; return;
-    }
-    try {
-      const res = await fetch(BASE + '/shop/update_settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ shop_id: shopId, working_days: checked.join(',') })
-      });
-      if (!res.ok) throw new Error();
-      msg.textContent = 'Working days saved.';
-      msg.className = 'form-msg ok';
-    } catch(e) {
-      msg.textContent = 'Failed to save working days.';
-      msg.className = 'form-msg err';
-    }
-  }
-
-  async function saveReminderHour() {
-    if (!shopId) return;
-    const msg = document.getElementById('reminder-hour-msg');
-    msg.className = 'form-msg';
-    const hour = parseInt(document.getElementById('reminder-send-hour').value);
-    try {
-      const res = await fetch(BASE + '/shop/update_settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ shop_id: shopId, reminder_send_hour: hour })
-      });
-      if (!res.ok) throw new Error();
-      msg.textContent = 'Send time saved.';
-      msg.className = 'form-msg ok';
-    } catch(e) {
-      msg.textContent = 'Failed to save send time.';
-      msg.className = 'form-msg err';
     }
   }
 
@@ -586,7 +539,7 @@
         body: JSON.stringify({
           barber_id: barberId,
           start_date: new Date(start).getTime(),
-          end_date: new Date(end).getTime(),
+          end_date:   new Date(end).getTime(),
           note: note || null
         })
       });
@@ -594,8 +547,8 @@
       msg.textContent = 'Away period added.';
       msg.className = 'form-msg ok';
       document.getElementById('h-start').value = '';
-      document.getElementById('h-end').value = '';
-      document.getElementById('h-note').value = '';
+      document.getElementById('h-end').value   = '';
+      document.getElementById('h-note').value  = '';
       loadHolidays();
     } catch(e) {
       msg.textContent = 'Failed to add away period.';
@@ -611,6 +564,52 @@
     } catch(e) { alert('Failed to remove away period.'); }
   }
 
+  // ── SHOP SETTINGS ─────────────────────────────────────
+  async function loadShopSettings() {
+    if (!shopId) return;
+    try {
+      const res  = await fetch(BASE + '/shop/settings?shop_id=' + shopId);
+      if (!res.ok) return;
+      const shop = await res.json();
+      if (shop.working_days) {
+        const days = shop.working_days.split(',').map(d => d.trim());
+        days.forEach(d => {
+          const cb = document.getElementById('day-' + d);
+          if (cb) cb.checked = true;
+        });
+      }
+    } catch(e) { console.warn('Could not load shop settings:', e); }
+  }
+
+  async function saveWorkingDays() {
+    if (!shopId) return;
+    const msg     = document.getElementById('working-days-msg');
+    msg.className = 'form-msg';
+    const checked = [];
+    for (let i = 1; i <= 7; i++) {
+      const cb = document.getElementById('day-' + i);
+      if (cb && cb.checked) checked.push(i);
+    }
+    if (checked.length === 0) {
+      msg.textContent = 'Please select at least one working day.';
+      msg.className = 'form-msg err'; return;
+    }
+    try {
+      const res = await fetch(BASE + '/shop/update_settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shop_id: shopId, working_days: checked.join(',') })
+      });
+      if (!res.ok) throw new Error();
+      msg.textContent = 'Working days saved.';
+      msg.className = 'form-msg ok';
+    } catch(e) {
+      msg.textContent = 'Failed to save working days.';
+      msg.className = 'form-msg err';
+    }
+  }
+
+  // ── ADD CUSTOMER MANUALLY ─────────────────────────────
   async function addCustomerManually() {
     const firstName      = document.getElementById('mc-firstname').value.trim();
     const lastName       = document.getElementById('mc-lastname').value.trim();
@@ -633,8 +632,9 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          first_name: firstName, last_name: lastName || null, phone: phone,
-          shop_id: shopId, barber_id: barberId, haircut_frequency_weeks: frequencyWeeks,
+          first_name: firstName, last_name: lastName || null, phone,
+          shop_id: shopId, barber_id: barberId,
+          haircut_frequency_weeks: frequencyWeeks,
           source: 'manual_dashboard'
         })
       });
@@ -657,7 +657,10 @@
         await fetch(BASE + '/visit/checkin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: phone, shop_id: shopId, barber_id: barberId, visited_at: new Date(lastVisitDate).getTime() })
+          body: JSON.stringify({
+            phone, shop_id: shopId, barber_id: barberId,
+            visited_at: new Date(lastVisitDate).getTime()
+          })
         }).catch(() => {});
       }
 
@@ -665,9 +668,11 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customer_id: customerId, customer_name: firstName, event_type: 'registered',
+          customer_id: customerId, customer_name: firstName,
+          event_type: 'registered',
           event_detail: 'Customer added manually by barber via dashboard. Frequency: every ' + frequencyWeeks + ' week(s).' + (lastVisitDate ? ' Last visit date provided: ' + lastVisitDate + '.' : ' No last visit date provided.'),
-          reminder_state_at_event: 'not_due', days_since_last_visit: lastVisitDate ? Math.floor((Date.now() - new Date(lastVisitDate).getTime()) / (1000 * 60 * 60 * 24)) : 0,
+          reminder_state_at_event: 'not_due',
+          days_since_last_visit: lastVisitDate ? Math.floor((Date.now() - new Date(lastVisitDate).getTime()) / 86400000) : 0,
           visit_was_reminder_driven: false
         })
       }).catch(() => {});
@@ -679,17 +684,18 @@
       document.getElementById('mc-lastvisit').value = '';
 
       msg.textContent = firstName + ' added successfully.';
-      msg.className = 'form-msg ok';
+      msg.className   = 'form-msg ok';
       loadCustomers();
 
     } catch(e) {
       msg.textContent = 'Something went wrong. Please try again.';
-      msg.className = 'form-msg err';
+      msg.className   = 'form-msg err';
     } finally {
       btn.disabled = false; btn.textContent = 'Add Customer';
     }
   }
 
+  // ── HELPERS ───────────────────────────────────────────
   function esc(str) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
