@@ -310,7 +310,7 @@
       btn.textContent = 'Registering...';
 
       try {
-        // Step 1 — Register (accept both success and duplicate)
+        // Step 1 — Register customer. Xano handles registered event logging internally.
         var regRes = await fetch(XANO + '/customer/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -324,8 +324,6 @@
           })
         });
 
-        var regData = await regRes.json();
-        var newCustomerId = regData.id || null;
         var isNew = regRes.ok;
 
         // Step 2 — Always check in regardless of whether registration was new or duplicate
@@ -338,24 +336,6 @@
         if (!checkinRes.ok) throw new Error('Check-in failed');
 
         localStorage.setItem(COOKIE_NAME, phone);
-
-        // Step 3 — Log registration event only for genuinely new customers
-        if (isNew && newCustomerId) {
-          fetch(XANO + '/customer/log_event', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              customer_id: newCustomerId,
-              customer_name: firstName,
-              event_type: 'registered',
-              event_detail: 'Customer registered via QR check-in page. Frequency stated: every ' + frequencyWeeks + ' week(s). Phone: ' + phone + '.',
-              reminder_state_at_event: 'not_due',
-              days_since_last_visit: 0,
-              visit_was_reminder_driven: false
-            })
-          }).catch(function() {});
-        }
-
         showConfirm(firstName, isNew);
 
       } catch(e) {
