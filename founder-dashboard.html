@@ -76,6 +76,13 @@
   .col-blue    { color: var(--blue); }
   .col-muted   { color: var(--muted); }
 
+  /* ── DRIFT ANALYSIS ─────────────────────────────────── */
+  .drift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 700px) { .drift-grid { grid-template-columns: 1fr; } }
+  .drift-card { background: var(--surface); border: 1px solid var(--border); padding: 26px 24px; }
+  .drift-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .drift-value { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; line-height: 1; margin-bottom: 8px; }
+  .drift-desc { font-size: 10px; color: var(--muted); line-height: 1.7; }
   /* ── CONVERSION CARDS ───────────────────────────────── */
   .conv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
   @media (max-width: 700px) { .conv-grid { grid-template-columns: 1fr; } }
@@ -271,6 +278,28 @@
       </div>
     </div>
 
+    <!-- ── DRIFT ANALYSIS ───────────────────────────────── -->
+    <div class="section-header">
+      <span class="section-title">Drift Analysis — Stated vs Actual</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="drift-grid">
+      <div class="drift-card">
+        <div class="drift-label">Avg Stated Frequency</div>
+        <div class="drift-value col-green" id="d-stated">—</div>
+        <div class="drift-desc">Average haircut cycle customers said they wanted at registration. What they intended.</div>
+      </div>
+      <div class="drift-card">
+        <div class="drift-label">Avg Actual Gap</div>
+        <div class="drift-value col-orange" id="d-actual">—</div>
+        <div class="drift-desc">Average real gap between visits, calculated from check-in timestamps. What actually happened.</div>
+      </div>
+      <div class="drift-card">
+        <div class="drift-label">Drift Gap</div>
+        <div class="drift-value col-red" id="d-gap">—</div>
+        <div class="drift-desc">The difference between stated and actual. This is the problem WalkIn. solves — measured with Nick's own customers.</div>
+      </div>
+    </div>
     <!-- ── CONVERSION INTELLIGENCE ──────────────────────── -->
     <div class="section-header">
       <span class="section-title">Conversion Intelligence</span>
@@ -529,9 +558,56 @@
     }
 
     computeConversion();
+    computeDrift();
     renderFlags();
   }
+  function computeDrift() {
+    const withFreq = allCustomers.filter(c => !c.opted_out && c.haircut_frequency_weeks > 0);
+    if (!withFreq.length) {
+      set('d-stated', '—');
+      set('d-actual', '—');
+      set('d-gap',    '—');
+      return;
+    }
+    const avgStated = withFreq.reduce((sum, c) => sum + c.haircut_frequency_weeks, 0) / withFreq.length;
 
+    const visitsByCustomer = {};
+    allEvents
+      .filter(e => e.event_type === 'visit')
+      .forEach(e => {
+        if (!visitsByCustomer[e.customer_id]) visitsByCustomer[e.customer_id] = [];
+        visitsByCustomer[e.customer_id].push(e.created_at);
+      });
+
+    const customerGaps = [];
+    Object.values(visitsByCustomer).forEach(times => {
+      const sorted = times.slice().sort((a, b) => a - b);
+      if (sorted.length < 2) return;
+      for (let i = 1; i < sorted.length; i++) {
+        customerGaps.push((sorted[i] - sorted[i - 1]) / 86400000);
+      }
+    });
+
+    if (!customerGaps.length) {
+      set('d-stated', avgStated.toFixed(1) + 'w');
+      set('d-actual', '< 2 visits');
+      set('d-gap',    '—');
+      document.getElementById('d-actual').className = 'drift-value col-muted';
+      return;
+    }
+
+    const avgActualDays = customerGaps.reduce((a, b) => a + b, 0) / customerGaps.length;
+    const avgActualWeeks = avgActualDays / 7;
+    const gap = avgActualWeeks - avgStated;
+
+    set('d-stated', avgStated.toFixed(1) + 'w');
+    set('d-actual', avgActualWeeks.toFixed(1) + 'w');
+    set('d-gap',    (gap > 0 ? '+' : '') + gap.toFixed(1) + 'w');
+
+    const gapEl = document.getElementById('d-gap');
+    gapEl.className = 'drift-value ' + (gap <= 0 ? 'col-green' : gap < 1 ? 'col-orange' : 'col-red');
+  }
+  
   function computeConversion() {
     // Build per-customer event lists sorted ascending
     const byId = {};
