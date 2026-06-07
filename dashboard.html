@@ -660,7 +660,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             phone, shop_id: shopId, barber_id: barberId,
-            visited_at: new Date(lastVisitDate).getTime()
+            visited_at: new Date(lastVisitDate).getTime(),
+            source: 'manual'
           })
         }).catch(() => {});
       }
