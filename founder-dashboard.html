@@ -251,7 +251,7 @@
 
     <!-- ── PILOT SCORECARD ──────────────────────────────── -->
     <div class="section-header" style="margin-top:0">
-      <span class="section-title">Pilot Scorecard — Nick Cuts</span>
+      <span class="section-title">Pilot Scorecard — Nicks Cuts Barbers</span>
       <div class="section-rule"></div>
     </div>
     <div class="metrics-grid">
@@ -306,7 +306,7 @@
       <div class="drift-card">
         <div class="drift-label">Drift Gap</div>
         <div class="drift-value col-red" id="d-gap">—</div>
-        <div class="drift-desc">The difference between stated and actual. This is the problem WalkIn. solves — measured with Nick's own customers.</div>
+        <div class="drift-desc">The difference between stated and actual. This is the problem WalkIn. solves — measured with Eren's own customers.</div>
       </div>
     </div>
 
@@ -561,7 +561,7 @@
     if (lapsed > 0) {
       const names = allCustomers.filter(c => !c.opted_out && c.reminder_state === 'lapsed').map(c => c.first_name).join(', ');
       document.getElementById('lapsed-text').innerHTML =
-        `<strong>${lapsed} customer${lapsed > 1 ? 's' : ''} lapsed</strong> — ${names}. These customers haven't returned after receiving all reminders. Consider a direct word from Nick.`;
+        `<strong>${lapsed} customer${lapsed > 1 ? 's' : ''} lapsed</strong> — ${names}. These customers haven't returned after receiving all reminders. Consider a direct word from Eren.`;
       lAlert.classList.add('show');
     } else {
       lAlert.classList.remove('show');
