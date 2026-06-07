@@ -4,74 +4,376 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WalkIn.</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Barlow:wght@300;400;500&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0C0C0A;
-      --surface: #161614;
-      --border: #252522;
+      --ink: #0C0C0A;
+      --surface: #111110;
+      --surface2: #171714;
+      --border: #1e1e1c;
+      --border2: #2a2a26;
       --border-active: #C9A84C;
       --text: #F5F0E6;
-      --muted: #6b6960;
-      --accent: #C9A84C;
-      --accent-dim: #a8893a;
+      --muted: #9a9690;
+      --muted2: #6b6860;
+      --gold: #C9A84C;
+      --gold-dim: #a8893c;
       --green-bg: #0d1f16;
       --red-bg: #1f0d0d;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { min-height: 100vh; background: var(--bg); }
-    body { font-family: 'DM Mono', monospace; color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 20px 48px; min-height: 100vh; }
-    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
-    .wrap { position: relative; z-index: 1; width: 100%; max-width: 400px; }
-    .wordmark { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; letter-spacing: -1.5px; color: var(--accent); text-align: center; margin-bottom: 6px; }
-    .tagline { text-align: center; font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 40px; }
-    .card { background: var(--surface); border: 1px solid var(--border); padding: 32px 28px; }
-    .card-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-    .card-sub { font-size: 11px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+    html, body { min-height: 100vh; background: var(--ink); }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px 48px;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* ── WORDMARK ── */
+    .wordmark {
+      font-family: 'DM Serif Display', serif;
+      font-size: 36px;
+      font-weight: 400;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .wordmark span { color: var(--gold); }
+
+    .tagline {
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 32px 28px;
+    }
+
+    .card-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      font-weight: 400;
+      letter-spacing: -0.3px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .card-sub {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.7;
+    }
+
+    /* ── FIELDS ── */
     .field { margin-bottom: 18px; }
-    .field label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 7px; }
-    .field input, .field select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px; padding: 11px 13px; outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; }
-    .field input:focus, .field select:focus { border-color: var(--border-active); }
-    .field input::placeholder { color: var(--muted); }
+
+    .field label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      background: var(--ink);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 15px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .field input:focus,
+    .field select:focus { border-color: var(--border-active); }
+
+    .field input::placeholder { color: var(--muted2); }
     .field input[readonly] { color: var(--muted); cursor: default; }
-    .field select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6960' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 13px center; background-color: var(--bg); padding-right: 36px; }
-    .field select option { background: #161614; }
-    .consent { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 24px; cursor: pointer; }
+
+    .field select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666660' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-color: var(--ink);
+      padding-right: 36px;
+    }
+
+    .field select option { background: #111110; }
+
+    /* ── CONSENT ── */
+    .consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 24px;
+      cursor: pointer;
+    }
+
     .consent input[type="checkbox"] { display: none; }
-    .consent-box { width: 18px; height: 18px; min-width: 18px; border: 1px solid var(--border); background: var(--bg); display: flex; align-items: center; justify-content: center; transition: all 0.15s; margin-top: 1px; }
-    .consent input:checked + .consent-box { border-color: var(--accent); background: #1f1a0d; }
-    .consent input:checked + .consent-box::after { content: ''; width: 8px; height: 5px; border-left: 1.5px solid var(--accent); border-bottom: 1.5px solid var(--accent); transform: rotate(-45deg) translateY(-1px); display: block; }
-    .consent-text { font-size: 11px; color: var(--muted); line-height: 1.6; }
-    .btn { width: 100%; background: var(--accent); color: #0C0C0A; border: none; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; padding: 13px; cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s; }
-    .btn:hover { background: var(--accent-dim); }
-    .btn:disabled { background: #2a2a26; color: #555; cursor: not-allowed; }
-    .btn-secondary { width: 100%; background: transparent; color: var(--muted); border: 1px solid var(--border); font-family: 'DM Mono', monospace; font-size: 12px; padding: 11px; cursor: pointer; margin-top: 10px; transition: all 0.2s; }
-    .btn-secondary:hover { border-color: var(--muted); color: var(--text); }
-    .msg { margin-top: 16px; padding: 12px 14px; font-size: 12px; line-height: 1.5; display: none; }
-    .msg.ok { background: var(--green-bg); color: #6ee0a0; border: 1px solid #1a3a28; display: block; }
-    .msg.err { background: var(--red-bg); color: #e08080; border: 1px solid #3a1a1a; display: block; }
-    .welcome-back { font-size: 13px; color: var(--accent); margin-bottom: 16px; padding: 10px 12px; border: 1px solid #2a2210; background: #1a1608; }
-    .confirm-icon { width: 56px; height: 56px; border: 2px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
-    .confirm-icon::after { content: ''; width: 20px; height: 12px; border-left: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-45deg) translateY(-2px); display: block; }
-    .confirm-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 8px; text-align: center; }
-    .confirm-name { color: var(--accent); }
-    .confirm-sub { font-size: 12px; color: var(--muted); line-height: 1.7; text-align: center; }
+
+    .consent-box {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      border: 1px solid var(--border2);
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      margin-top: 2px;
+    }
+
+    .consent input:checked + .consent-box {
+      border-color: var(--gold);
+      background: #1a1608;
+    }
+
+    .consent input:checked + .consent-box::after {
+      content: '';
+      width: 8px;
+      height: 5px;
+      border-left: 1.5px solid var(--gold);
+      border-bottom: 1.5px solid var(--gold);
+      transform: rotate(-45deg) translateY(-1px);
+      display: block;
+    }
+
+    .consent-text {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      width: 100%;
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover { background: var(--gold-dim); }
+
+    .btn:disabled {
+      background: #2a2a26;
+      color: #555552;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      width: 100%;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border2);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--muted);
+      color: var(--text);
+    }
+
+    /* ── MESSAGES ── */
+    .msg {
+      margin-top: 16px;
+      padding: 12px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 0.3px;
+      display: none;
+    }
+
+    .msg.ok {
+      background: var(--green-bg);
+      color: #6ee0a0;
+      border: 1px solid #1a3a28;
+      display: block;
+    }
+
+    .msg.err {
+      background: var(--red-bg);
+      color: #e08080;
+      border: 1px solid #3a1a1a;
+      display: block;
+    }
+
+    /* ── WELCOME BACK ── */
+    .welcome-back {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      font-weight: 400;
+      letter-spacing: -0.3px;
+      color: var(--gold);
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      border: 1px solid #2a2210;
+      background: #1a1608;
+    }
+
+    /* ── CONFIRMATION ── */
+    .confirm-icon {
+      width: 52px;
+      height: 52px;
+      border: 1px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+    }
+
+    .confirm-icon::after {
+      content: '';
+      width: 18px;
+      height: 11px;
+      border-left: 1.5px solid var(--gold);
+      border-bottom: 1.5px solid var(--gold);
+      transform: rotate(-45deg) translateY(-2px);
+      display: block;
+    }
+
+    .confirm-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 26px;
+      font-weight: 400;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .confirm-name { color: var(--gold); }
+
+    .confirm-sub {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.8;
+      text-align: center;
+    }
+
+    /* ── LOADING ── */
     #screen-loading { text-align: center; padding: 40px 0; }
-    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
+
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 1px solid var(--border2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { font-size: 12px; color: var(--muted); }
+
+    .loading-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    /* ── SCREENS ── */
     .screen { display: none; }
     .screen.active { display: block; }
-    .fade-in { animation: fadeIn 0.35s ease forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-    .footer { margin-top: 32px; text-align: center; font-size: 10px; color: #3a3a36; letter-spacing: 0.5px; }
-    .footer a { color: #3a3a36; text-decoration: none; margin: 0 10px; }
+
+    .fade-in { animation: fadeIn 0.3s ease forwards; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 32px;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted2);
+      letter-spacing: 0.5px;
+    }
+
+    .footer a {
+      color: var(--muted2);
+      text-decoration: none;
+      margin: 0 10px;
+      transition: color 0.2s;
+    }
+
     .footer a:hover { color: var(--muted); }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="wordmark">WalkIn.</div>
+    <div class="wordmark">WalkIn<span>.</span></div>
     <div class="tagline">Stay connected with your barber</div>
 
     <!-- Loading -->
@@ -88,7 +390,7 @@
         <div class="card-title">Check in</div>
         <div class="card-sub">Enter your mobile number to check in or register.</div>
         <div class="field">
-          <label>Mobile number <span style="color:var(--accent)">*</span></label>
+          <label>Mobile number <span style="color:var(--gold)">*</span></label>
           <input type="tel" id="p-phone" placeholder="e.g. 07700 900001" autocomplete="tel">
         </div>
         <button class="btn" id="phone-btn" onclick="lookupPhone()">Continue</button>
@@ -113,7 +415,7 @@
         <div class="card-title">Stay connected</div>
         <div class="card-sub">Register once and we'll remind you when you're due for your next cut. Takes 20 seconds.</div>
         <div class="field">
-          <label>First name <span style="color:var(--accent)">*</span></label>
+          <label>First name <span style="color:var(--gold)">*</span></label>
           <input type="text" id="r-firstname" placeholder="e.g. James" autocomplete="given-name">
         </div>
         <div class="field">
@@ -125,7 +427,7 @@
           <input type="tel" id="r-phone" autocomplete="tel" readonly>
         </div>
         <div class="field">
-          <label>How often do you get a haircut? <span style="color:var(--accent)">*</span></label>
+          <label>How often do you get a haircut? <span style="color:var(--gold)">*</span></label>
           <select id="r-frequency">
             <option value="">Select frequency</option>
             <option value="1">Every week</option>
@@ -155,7 +457,7 @@
         <div class="confirm-icon"></div>
         <div class="confirm-title">Checked in<span class="confirm-name" id="confirm-name"></span></div>
         <div class="confirm-sub" id="confirm-sub">We'll message you when you're due for your next cut. Reply STOP at any time to opt out.</div>
-        <div class="confirm-sub" style="margin-top:12px;font-size:10px;color:#4a4a46;">Tip: Use your Camera app to scan the QR code for instant check-in next time.</div>
+        <div class="confirm-sub" style="margin-top:14px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:0.5px;">Tip: Use your Camera app to scan the QR code for instant check-in next time.</div>
       </div>
     </div>
 
