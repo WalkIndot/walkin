@@ -97,6 +97,11 @@
   .notes-toggle-btn:hover { color: var(--accent); }
   .has-notes { color: var(--accent); font-size: 10px; }
 
+  /* ── LOG VISIT BUTTON ────────────────────────────────── */
+  .log-visit-btn { background: none; border: none; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; cursor: pointer; padding: 0 4px; text-decoration: underline; transition: color 0.15s; }
+  .log-visit-btn:hover { color: var(--green); }
+  .log-visit-btn:disabled { color: var(--muted2); cursor: not-allowed; text-decoration: none; }
+
   /* ── CARDS ───────────────────────────────────────────── */
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
@@ -200,7 +205,7 @@
       <table id="customers-table" style="display:none">
         <thead>
           <tr>
-            <th>Name</th><th>Phone</th><th>Barber</th><th>Frequency</th><th>Last Visit</th><th>State</th><th>Opted Out</th><th>Notes</th>
+            <th>Name</th><th>Phone</th><th>Frequency</th><th>Last Visit</th><th>State</th><th>Opted Out</th><th>Visit</th><th>Notes</th>
           </tr>
         </thead>
         <tbody id="customers-tbody"></tbody>
@@ -413,14 +418,15 @@
         const state      = c.opted_out ? 'opted_out' : (c.reminder_state || 'not_due');
         const stateLabel = state.replace('_', ' ');
         const hasNotes   = c.notes && c.notes.trim().length > 0;
+        
         return `<tr>
           <td>${esc(c.first_name || '—')}</td>
           <td class="td-muted">${esc(c.phone || '—')}</td>
-          <td class="td-muted">${esc(BARBERS[c.barber_id] || '—')}</td>
           <td class="td-muted">Every ${c.haircut_frequency_weeks || '?'} wks</td>
           <td class="td-muted">${lastVisit}</td>
           <td><span class="badge badge-${state}">${stateLabel}</span></td>
           <td class="td-muted">${c.opted_out ? 'Yes' : '—'}</td>
+          <td><button class="log-visit-btn" id="lv-${esc(c.phone)}" onclick="logVisit('${esc(c.phone)}', '${esc(c.first_name || 'this customer')}')">log visit</button></td>
           <td><button class="notes-toggle-btn" onclick="toggleNotes('${esc(c.phone)}', this)">${hasNotes ? '<span class="has-notes">&#9679; edit</span>' : 'add'}</button></td>
         </tr>
         <tr class="notes-row" id="notes-row-${esc(c.phone)}" style="display:none">
@@ -441,6 +447,42 @@
     } catch(e) {
       document.getElementById('customers-loading').innerHTML =
         '<span style="color:var(--red)">Failed to load customers.</span>';
+    }
+  }
+
+  // ── LOG VISIT ─────────────────────────────────────────
+  async function logVisit(phone, firstName) {
+    if (!confirm('Log a visit today for ' + firstName + '?')) return;
+    if (!shopId || !barberId) {
+      alert('Session error — please sign out and sign back in.');
+      return;
+    }
+    const btn = document.getElementById('lv-' + phone);
+    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+    try {
+      const res = await fetch(BASE + '/visit/checkin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, shop_id: shopId, barber_id: barberId })
+      });
+      if (!res.ok) throw new Error();
+      // Log the event
+      fetch(BASE + '/customer/log_event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer_name: firstName,
+          event_type: 'visit',
+          event_detail: 'Visit logged manually by barber via dashboard.',
+          visit_was_reminder_driven: false
+        })
+      }).catch(() => {});
+      if (btn) { btn.textContent = 'done ✓'; btn.style.color = 'var(--green)'; }
+      // Refresh table after short delay so barber sees confirmation first
+      setTimeout(() => loadCustomers(), 1500);
+    } catch(e) {
+      if (btn) { btn.disabled = false; btn.textContent = 'log visit'; }
+      alert('Failed to log visit. Please try again.');
     }
   }
 
