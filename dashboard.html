@@ -150,6 +150,15 @@
   .how-item { display: flex; gap: 10px; align-items: flex-start; font-size: 11px; color: var(--muted); line-height: 1.6; }
   .how-item::before { content: '—'; color: var(--accent); flex-shrink: 0; }
 
+
+  /* ── SORTABLE HEADERS ────────────────────────────────── */
+  thead th.sortable { cursor: pointer; user-select: none; }
+  thead th.sortable:hover { color: var(--text); }
+  thead th.sortable .sort-arrow { margin-left: 5px; color: var(--accent); font-size: 9px; }
+  thead th.sort-asc .sort-arrow::after  { content: '↑'; }
+  thead th.sort-desc .sort-arrow::after { content: '↓'; }
+  thead th.sortable:not(.sort-asc):not(.sort-desc) .sort-arrow::after { content: '↕'; color: var(--muted2); }
+
   /* ── LOADING ─────────────────────────────────────────── */
   .loading { color: var(--muted); font-size: 12px; padding: 24px 0; }
   .spinner { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
@@ -205,7 +214,7 @@
       <table id="customers-table" style="display:none">
         <thead>
           <tr>
-            <th>Name</th><th>Phone</th><th>Frequency</th><th>Last Visit</th><th>State</th><th>Opted Out</th><th>Visit</th><th>Notes</th>
+            <th class="sortable" onclick="sortBy('name')">Name<span class="sort-arrow"></span></th><th>Phone</th><th class="sortable" onclick="sortBy('frequency')">Frequency<span class="sort-arrow"></span></th><th class="sortable" onclick="sortBy('last_visit')">Last Visit<span class="sort-arrow"></span></th><th class="sortable" onclick="sortBy('state')">State<span class="sort-arrow"></span></th><th>Opted Out</th><th>Visit</th><th>Notes</th>
           </tr>
         </thead>
         <tbody id="customers-tbody"></tbody>
@@ -338,6 +347,11 @@
   let authToken = sessionStorage.getItem('walkin_token') || null;
   let barberId  = parseInt(sessionStorage.getItem('walkin_barber_id')) || null;
   let shopId    = parseInt(sessionStorage.getItem('walkin_shop_id')) || null;
+  let allCustomers = [];
+  let sortCol  = 'last_visit';
+  let sortDir  = 'desc'; // newest first by default
+
+  const STATE_ORDER = { overdue:0, due:1, due_soon:2, lapsed:3, reminded:4, not_due:5, opted_out:6 };
 
   if (authToken) showDashboard();
 
@@ -410,8 +424,58 @@
           '<tr><td colspan="8" class="td-muted">No customers yet.</td></tr>';
         return;
       }
-      document.getElementById('customer-count').textContent = customers.length + ' registered';
-      document.getElementById('customers-tbody').innerHTML = customers.map(c => {
+      allCustomers = customers;
+      renderCustomers();
+    } catch(e) {
+      document.getElementById('customers-loading').innerHTML =
+        '<span style="color:var(--red)">Failed to load customers.</span>';
+    }
+  }
+
+  function sortBy(col) {
+    if (sortCol === col) {
+      sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortCol = col;
+      sortDir = col === 'last_visit' ? 'desc' : 'asc';
+    }
+    // Update header arrows
+    document.querySelectorAll('thead th.sortable').forEach(th => {
+      th.classList.remove('sort-asc', 'sort-desc');
+    });
+    const colMap = { name: 0, frequency: 2, last_visit: 3, state: 4 };
+    const thIndex = colMap[col];
+    const ths = document.querySelectorAll('thead th.sortable');
+    // Find the right th by onclick attribute
+    document.querySelectorAll('thead th.sortable').forEach(th => {
+      if (th.getAttribute('onclick') === "sortBy('" + col + "')") {
+        th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+      }
+    });
+    renderCustomers();
+  }
+
+  function getSortValue(c, col) {
+    if (col === 'name')      return (c.first_name || '').toLowerCase();
+    if (col === 'frequency') return c.haircut_frequency_weeks || 99;
+    if (col === 'last_visit') return c.last_visit_at || 0;
+    if (col === 'state') {
+      const s = c.opted_out ? 'opted_out' : (c.reminder_state || 'not_due');
+      return STATE_ORDER[s] !== undefined ? STATE_ORDER[s] : 99;
+    }
+    return 0;
+  }
+
+  function renderCustomers() {
+    const sorted = [...allCustomers].sort((a, b) => {
+      const av = getSortValue(a, sortCol);
+      const bv = getSortValue(b, sortCol);
+      if (av < bv) return sortDir === 'asc' ? -1 : 1;
+      if (av > bv) return sortDir === 'asc' ?  1 : -1;
+      return 0;
+    });
+    document.getElementById('customer-count').textContent = allCustomers.length + ' registered';
+    document.getElementById('customers-tbody').innerHTML = sorted.map(c => {
         const lastVisit = c.last_visit_at
           ? new Date(c.last_visit_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
           : '—';
@@ -443,11 +507,7 @@
             </div>
           </td>
         </tr>`;
-      }).join('');
-    } catch(e) {
-      document.getElementById('customers-loading').innerHTML =
-        '<span style="color:var(--red)">Failed to load customers.</span>';
-    }
+    }).join('');
   }
 
   // ── LOG VISIT ─────────────────────────────────────────
