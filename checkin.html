@@ -278,6 +278,27 @@
       background: #1a1608;
     }
 
+    /* ── RESUBSCRIBE ── */
+    .resub-notice {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .resub-start {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: #6ee0a0;
+      background: var(--green-bg);
+      border: 1px solid #1a3a28;
+      padding: 14px;
+      line-height: 1.6;
+      margin-top: 16px;
+      display: none;
+    }
+
     /* ── CONFIRMATION ── */
     .confirm-icon {
       width: 52px;
@@ -399,7 +420,7 @@
       </div>
     </div>
 
-    <!-- Welcome back (returning customer) -->
+    <!-- Welcome back (returning customer, not opted out) -->
     <div id="screen-returning" class="screen">
       <div class="card fade-in">
         <div class="welcome-back" id="returning-greeting">Welcome back!</div>
@@ -407,6 +428,18 @@
         <button class="btn" id="returning-btn" onclick="doReturningCheckin()">Check in</button>
         <button class="btn-secondary" onclick="showScreen('screen-phone')">Not you? Go back</button>
         <div class="msg" id="returning-msg"></div>
+      </div>
+    </div>
+
+    <!-- Opt-back-in screen (returning customer, opted out) -->
+    <div id="screen-resubscribe" class="screen">
+      <div class="card fade-in">
+        <div class="welcome-back" id="resub-greeting">Welcome back!</div>
+        <div class="resub-notice">You previously stopped reminders. Would you like to receive them again when you're due for your next cut?</div>
+        <button class="btn" id="resub-yes-btn" onclick="doResubscribe()">Yes, restart reminders</button>
+        <button class="btn-secondary" onclick="doReturningCheckinNoResub()">No thanks, just check in</button>
+        <div class="resub-start" id="resub-start-msg"></div>
+        <div class="msg" id="resub-msg"></div>
       </div>
     </div>
 
@@ -473,6 +506,7 @@
     const XANO = 'https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm';
     const COOKIE_NAME = 'walkin_phone';
     const COOKIE_DAYS = 365;
+    const TWILIO_NUMBER = '+447576151912';
 
     const params = new URLSearchParams(window.location.search);
     const shopId = parseInt(params.get('shop_id'));
@@ -480,6 +514,7 @@
 
     var lookedUpPhone = '';
     var lookedUpName = '';
+    var visitAlreadyLogged = false;
 
     function setCookie(name, value, days) {
       var expires = new Date(Date.now() + days * 864e5).toUTCString();
@@ -506,6 +541,7 @@
       showScreen('screen-confirm');
     }
 
+    // ── AUTO CHECK-IN (saved cookie) ──────────────────────
     async function autoCheckin(phone) {
       try {
         var res = await fetch(XANO + '/visit/checkin', {
@@ -515,7 +551,18 @@
         });
         var data = await res.json();
         if (res.ok) {
-          showConfirm(data.first_name || '', false);
+          var customer = Array.isArray(data) ? data[0] : data;
+          if (customer && customer.opted_out === true) {
+            // Visit logged — now offer opt-back-in
+            visitAlreadyLogged = true;
+            lookedUpPhone = phone;
+            lookedUpName = customer.first_name || '';
+            document.getElementById('resub-greeting').textContent =
+              lookedUpName ? 'Welcome back, ' + lookedUpName + '!' : 'Welcome back!';
+            showScreen('screen-resubscribe');
+          } else {
+            showConfirm(customer ? customer.first_name : '', false);
+          }
         } else {
           localStorage.removeItem(COOKIE_NAME);
           showScreen('screen-phone');
@@ -526,6 +573,7 @@
       }
     }
 
+    // ── PHONE LOOKUP ──────────────────────────────────────
     async function lookupPhone() {
       var phone = document.getElementById('p-phone').value.trim().replace(/\s/g, '');
       var btn = document.getElementById('phone-btn');
@@ -548,9 +596,18 @@
 
         if (Array.isArray(data) && data.length > 0) {
           lookedUpName = data[0].first_name || '';
-          document.getElementById('returning-greeting').textContent =
-            lookedUpName ? 'Welcome back, ' + lookedUpName + '!' : 'Welcome back!';
-          showScreen('screen-returning');
+
+          if (data[0].opted_out === true) {
+            // Opted out — show resubscribe screen
+            document.getElementById('resub-greeting').textContent =
+              lookedUpName ? 'Welcome back, ' + lookedUpName + '!' : 'Welcome back!';
+            showScreen('screen-resubscribe');
+          } else {
+            // Normal returning customer
+            document.getElementById('returning-greeting').textContent =
+              lookedUpName ? 'Welcome back, ' + lookedUpName + '!' : 'Welcome back!';
+            showScreen('screen-returning');
+          }
         } else {
           document.getElementById('r-phone').value = phone;
           showScreen('screen-register');
@@ -564,6 +621,7 @@
       }
     }
 
+    // ── RETURNING CHECK-IN (not opted out) ───────────────
     async function doReturningCheckin() {
       var btn = document.getElementById('returning-btn');
       var msg = document.getElementById('returning-msg');
@@ -594,6 +652,67 @@
       }
     }
 
+    // ── RESUBSCRIBE — YES ─────────────────────────────────
+    async function doResubscribe() {
+      var btn = document.getElementById('resub-yes-btn');
+      var msg = document.getElementById('resub-msg');
+      var startMsg = document.getElementById('resub-start-msg');
+      msg.className = 'msg';
+      btn.disabled = true;
+      btn.textContent = 'Restarting...';
+
+      try {
+        // Step 1 — flip opted_out to false in Xano
+        var resubRes = await fetch(XANO + '/customer/resubscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: lookedUpPhone })
+        });
+        if (!resubRes.ok) throw new Error('Resubscribe failed');
+
+        // Step 2 — log the visit (only if not already logged by autoCheckin)
+        if (!visitAlreadyLogged) {
+          await fetch(XANO + '/visit/checkin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: lookedUpPhone, shop_id: shopId, barber_id: barberId })
+          }).catch(function() {});
+        }
+
+        // Step 3 — show START instruction
+        localStorage.setItem(COOKIE_NAME, lookedUpPhone);
+        btn.style.display = 'none';
+        document.querySelector('#screen-resubscribe .btn-secondary').style.display = 'none';
+        startMsg.style.display = 'block';
+        startMsg.textContent = 'One more step — text START to ' + TWILIO_NUMBER + ' from your phone to restart your reminders.';
+
+      } catch(e) {
+        msg.className = 'msg err';
+        msg.textContent = 'Something went wrong. Please try again.';
+        btn.disabled = false;
+        btn.textContent = 'Yes, restart reminders';
+      }
+    }
+
+    // ── RESUBSCRIBE — NO THANKS ───────────────────────────
+    async function doReturningCheckinNoResub() {
+      // Just log the visit and confirm — no resubscribe
+      try {
+        if (!visitAlreadyLogged) {
+          await fetch(XANO + '/visit/checkin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: lookedUpPhone, shop_id: shopId, barber_id: barberId })
+          }).catch(function() {});
+        }
+        localStorage.setItem(COOKIE_NAME, lookedUpPhone);
+        showConfirm(lookedUpName, false);
+      } catch(e) {
+        showConfirm(lookedUpName, false);
+      }
+    }
+
+    // ── REGISTER ──────────────────────────────────────────
     async function doRegister() {
       var firstName = document.getElementById('r-firstname').value.trim();
       var lastName = document.getElementById('r-lastname').value.trim();
@@ -613,7 +732,6 @@
       btn.textContent = 'Registering...';
 
       try {
-        // Step 1 — Register customer. Xano handles registered event logging internally.
         var regRes = await fetch(XANO + '/customer/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -629,7 +747,6 @@
 
         var isNew = regRes.ok;
 
-        // Step 2 — Always check in regardless of whether registration was new or duplicate
         var checkinRes = await fetch(XANO + '/visit/checkin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
