@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>WalkIn.</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:    #0C0C0A;
+      --gold:   #C9A84C;
+      --cream:  #F5F0E6;
+      --muted:  #9a9690;
+      --dim:    #4a4a46;
+      --border: #1e1e1c;
+      --surface:#111110;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--ink);
+      color: var(--cream);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Each section fills the screen */
+    .panel {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel:last-child { border-bottom: none; }
+
+    /* ── EYEBROW ── */
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+    }
+
+    /* ── PANEL 1 ── */
+    .p1-head {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(44px, 12vw, 72px);
+      font-weight: 400;
+      line-height: 1.0;
+      letter-spacing: -1.5px;
+      margin-bottom: 24px;
+    }
+
+    .p1-head em { font-style: italic; color: var(--gold); }
+
+    .p1-sub {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 280px;
+    }
+
+    /* ── PANEL 2 ── */
+    .p2-statement {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(32px, 8vw, 52px);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.8px;
+    }
+
+    .p2-statement em { font-style: italic; color: var(--gold); }
+
+    /* ── PANEL 3 ── */
+    .trio {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .trio-item {
+      padding: 22px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 20px;
+      font-weight: 300;
+      color: var(--cream);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .trio-item:first-child { border-top: 1px solid var(--border); }
+    .trio-item.visible { opacity: 1; transform: translateY(0); }
+    .trio-item:nth-child(2) { transition-delay: 0.1s; }
+    .trio-item:nth-child(3) { transition-delay: 0.2s; }
+
+    .trio-dash {
+      color: var(--gold);
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ── PANEL 4 — ACTION ── */
+    .p4-head {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(32px, 8vw, 52px);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.8px;
+      margin-bottom: 40px;
+    }
+
+    .p4-head em { font-style: italic; color: var(--gold); }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      align-items: baseline;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .step:first-of-type { border-top: 1px solid var(--border); }
+
+    .step-n {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--gold);
+      letter-spacing: 1px;
+      min-width: 20px;
+    }
+
+    .step-t {
+      font-size: 17px;
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1.5;
+    }
+
+    .wordmark {
+      font-family: 'DM Serif Display', serif;
+      font-size: 24px;
+      color: var(--cream);
+      margin-top: 40px;
+      letter-spacing: -0.3px;
+    }
+
+    .wordmark span { color: var(--gold); }
+
+    .opt-out {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--dim);
+      letter-spacing: 0.5px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. HOOK -->
+  <div class="panel">
+    <h1 class="p1-head">We look<br>after your<br><em>regulars.</em></h1>
+    <p class="p1-sub">Scroll to find out how.</p>
+  </div>
+
+  <!-- 2. THE ONE THING -->
+  <div class="panel" style="background:var(--surface)">
+    <div class="eyebrow">What it does</div>
+    <p class="p2-statement">When you're due,<br>we'll <em>message you.</em></p>
+  </div>
+
+  <!-- 3. NO FRICTION -->
+  <div class="panel">
+    <div class="eyebrow">What it isn't</div>
+    <div class="trio">
+      <div class="trio-item"><span class="trio-dash">—</span>No app</div>
+      <div class="trio-item"><span class="trio-dash">—</span>No account</div>
+      <div class="trio-item"><span class="trio-dash">—</span>No booking</div>
+    </div>
+  </div>
+
+  <!-- 4. ACTION -->
+  <div class="panel" style="background:var(--surface)">
+    <div class="eyebrow">After your cut</div>
+    <h2 class="p4-head">One scan.<br><em>That's it.</em></h2>
+    <div class="step">
+      <span class="step-n">01</span>
+      <span class="step-t">Get your cut as normal</span>
+    </div>
+    <div class="step">
+      <span class="step-n">02</span>
+      <span class="step-t">Scan the code at the chair — 20 seconds</span>
+    </div>
+    <div class="step">
+      <span class="step-n">03</span>
+      <span class="step-t">We'll message you when you're due. Walk in whenever.</span>
+    </div>
+    <div class="wordmark">WalkIn<span>.</span></div>
+    <p class="opt-out">Reply STOP at any time to opt out</p>
+  </div>
+
+  <script>
+    // Animate trio items on scroll
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('.trio-item').forEach(el => obs.observe(el));
+  </script>
+
+</body>
+</html>
