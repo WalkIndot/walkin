@@ -87,6 +87,7 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 0;
+    width: 100%;
   }
 
   .qr-wrap {
@@ -148,6 +149,23 @@
     font-weight: 600;
   }
 
+
+  /* ── SCAN ME ── */
+  .scan-me {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: #f5f0e6;
+    letter-spacing: -0.5px;
+    margin-top: 12px;
+    text-align: center;
+  }
+
+  .scan-me em {
+    font-style: italic;
+    color: #c9a84c;
+  }
+
   /* ── FOOTER — identical to poster ── */
   .divider {
     border: none;
@@ -201,9 +219,8 @@
   <div class="wordmark">WalkIn<span>.</span></div>
 
   <div class="headline">Your barber looks<br>after his <em>regulars.</em></div>
-  <div class="subtext">Scan to find out how.</div>
 
-  <div style="flex:0.3"></div>
+  <div style="flex:0.5"></div>
   <div class="qr-section">
     <div class="qr-wrap">
       <!--
@@ -218,6 +235,7 @@
     </div>
     
   </div>
+  <div class="scan-me">Scan <em>me.</em></div>
   <div style="flex:1"></div>
 
   <hr class="divider">
