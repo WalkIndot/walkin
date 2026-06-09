@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WalkIn.</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
@@ -17,26 +17,23 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
+    html, body { background: var(--ink); }
     body {
-      background: var(--ink);
       color: var(--cream);
       font-family: 'Barlow', sans-serif;
       font-weight: 300;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Each section fills the screen */
+    /* ── PANELS ── */
     .panel {
-      min-height: 100svh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 48px 32px;
+      width: 100%;
+      padding: 64px 32px;
       border-bottom: 1px solid var(--border);
     }
 
     .panel:last-child { border-bottom: none; }
+    .panel-alt { background: var(--surface); }
 
     /* ── EYEBROW ── */
     .eyebrow {
@@ -44,49 +41,49 @@
       font-size: 10px;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 28px;
+      color: var(--dim);
+      margin-bottom: 24px;
+      display: block;
     }
 
     /* ── PANEL 1 ── */
+    .p1 { padding-top: 80px; padding-bottom: 80px; }
+
     .p1-head {
       font-family: 'DM Serif Display', serif;
-      font-size: clamp(44px, 12vw, 72px);
+      font-size: 56px;
       font-weight: 400;
       line-height: 1.0;
-      letter-spacing: -1.5px;
-      margin-bottom: 24px;
+      letter-spacing: -2px;
+      margin-bottom: 32px;
     }
 
     .p1-head em { font-style: italic; color: var(--gold); }
 
     .p1-sub {
-      font-size: 16px;
-      color: var(--muted);
-      line-height: 1.6;
-      max-width: 280px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--dim);
     }
 
     /* ── PANEL 2 ── */
     .p2-statement {
       font-family: 'DM Serif Display', serif;
-      font-size: clamp(32px, 8vw, 52px);
+      font-size: 40px;
       font-weight: 400;
-      line-height: 1.1;
-      letter-spacing: -0.8px;
+      line-height: 1.15;
+      letter-spacing: -1px;
     }
 
     .p2-statement em { font-style: italic; color: var(--gold); }
 
     /* ── PANEL 3 ── */
-    .trio {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
+    .trio { margin-top: 8px; }
 
     .trio-item {
-      padding: 22px 0;
+      padding: 20px 0;
       border-bottom: 1px solid var(--border);
       font-size: 20px;
       font-weight: 300;
@@ -95,30 +92,25 @@
       align-items: center;
       gap: 16px;
       opacity: 0;
-      transform: translateY(12px);
-      transition: opacity 0.35s ease, transform 0.35s ease;
+      transform: translateY(10px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
     }
 
     .trio-item:first-child { border-top: 1px solid var(--border); }
     .trio-item.visible { opacity: 1; transform: translateY(0); }
-    .trio-item:nth-child(2) { transition-delay: 0.1s; }
-    .trio-item:nth-child(3) { transition-delay: 0.2s; }
+    .trio-item:nth-child(2) { transition-delay: 0.12s; }
+    .trio-item:nth-child(3) { transition-delay: 0.24s; }
 
-    .trio-dash {
-      color: var(--gold);
-      font-family: 'DM Mono', monospace;
-      font-size: 14px;
-      flex-shrink: 0;
-    }
+    .trio-dash { color: var(--gold); font-family: 'DM Mono', monospace; }
 
-    /* ── PANEL 4 — ACTION ── */
+    /* ── PANEL 4 ── */
     .p4-head {
       font-family: 'DM Serif Display', serif;
-      font-size: clamp(32px, 8vw, 52px);
+      font-size: 40px;
       font-weight: 400;
-      line-height: 1.1;
-      letter-spacing: -0.8px;
-      margin-bottom: 40px;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin-bottom: 36px;
     }
 
     .p4-head em { font-style: italic; color: var(--gold); }
@@ -139,10 +131,11 @@
       color: var(--gold);
       letter-spacing: 1px;
       min-width: 20px;
+      padding-top: 2px;
     }
 
     .step-t {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 300;
       color: var(--cream);
       line-height: 1.5;
@@ -150,10 +143,11 @@
 
     .wordmark {
       font-family: 'DM Serif Display', serif;
-      font-size: 24px;
+      font-size: 26px;
       color: var(--cream);
-      margin-top: 40px;
+      margin-top: 44px;
       letter-spacing: -0.3px;
+      display: block;
     }
 
     .wordmark span { color: var(--gold); }
@@ -164,26 +158,27 @@
       color: var(--dim);
       letter-spacing: 0.5px;
       margin-top: 10px;
+      display: block;
     }
   </style>
 </head>
 <body>
 
-  <!-- 1. HOOK -->
-  <div class="panel">
+  <!-- 1 -->
+  <div class="panel p1">
     <h1 class="p1-head">We look<br>after your<br><em>regulars.</em></h1>
-    <p class="p1-sub">Scroll to find out how.</p>
+    <span class="p1-sub">Scroll to find out how</span>
   </div>
 
-  <!-- 2. THE ONE THING -->
-  <div class="panel" style="background:var(--surface)">
-    <div class="eyebrow">What it does</div>
+  <!-- 2 -->
+  <div class="panel panel-alt">
+    <span class="eyebrow">What it does</span>
     <p class="p2-statement">When you're due,<br>we'll <em>message you.</em></p>
   </div>
 
-  <!-- 3. NO FRICTION -->
+  <!-- 3 -->
   <div class="panel">
-    <div class="eyebrow">What it isn't</div>
+    <span class="eyebrow">What it isn't</span>
     <div class="trio">
       <div class="trio-item"><span class="trio-dash">—</span>No app</div>
       <div class="trio-item"><span class="trio-dash">—</span>No account</div>
@@ -191,9 +186,9 @@
     </div>
   </div>
 
-  <!-- 4. ACTION -->
-  <div class="panel" style="background:var(--surface)">
-    <div class="eyebrow">After your cut</div>
+  <!-- 4 -->
+  <div class="panel panel-alt">
+    <span class="eyebrow">After your cut</span>
     <h2 class="p4-head">One scan.<br><em>That's it.</em></h2>
     <div class="step">
       <span class="step-n">01</span>
@@ -207,15 +202,14 @@
       <span class="step-n">03</span>
       <span class="step-t">We'll message you when you're due. Walk in whenever.</span>
     </div>
-    <div class="wordmark">WalkIn<span>.</span></div>
-    <p class="opt-out">Reply STOP at any time to opt out</p>
+    <span class="wordmark">WalkIn<span>.</span></span>
+    <span class="opt-out">Reply STOP at any time to opt out</span>
   </div>
 
   <script>
-    // Animate trio items on scroll
     const obs = new IntersectionObserver(entries => {
       entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.3 });
+    }, { threshold: 0.2 });
     document.querySelectorAll('.trio-item').forEach(el => obs.observe(el));
   </script>
 
