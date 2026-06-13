@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FX8RDXE8CC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-FX8RDXE8CC');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WalkIn. — Stay connected with your regulars</title>
+  <meta name="description" content="WalkIn. helps walk-in barbers keep regular customers coming back at the right time. Automated SMS reminders. No app. No booking system.">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0c0c0a;
+      --gold: #c9a84c;
+      --gold-dim: #a8893c;
+      --cream: #f5f0e6;
+      --cream-dim: #e8e2d4;
+      --surface: #111110;
+      --surface2: #171714;
+      --border: #1e1e1c;
+      --border2: #2a2a26;
+      --muted: #666660;
+      --muted2: #444440;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--ink);
+      color: var(--cream);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(12, 12, 10, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 48px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: var(--cream);
+      letter-spacing: -0.3px;
+    }
+
+    .nav-logo span { color: var(--gold); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+    }
+
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--cream); }
+
+    .nav-cta {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      padding: 9px 22px;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+
+    .nav-cta:hover { background: var(--gold-dim); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: calc(100vh - 64px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 48px;
+      max-width: 900px;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 32px;
+    }
+
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(48px, 7vw, 80px);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -1.5px;
+      color: var(--cream);
+      margin-bottom: 32px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--muted);
+      max-width: 500px;
+      line-height: 1.7;
+      margin-bottom: 52px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-gold {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      padding: 14px 32px;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-gold:hover { background: var(--gold-dim); }
+
+    .btn-ghost {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border2);
+      padding-bottom: 3px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .btn-ghost:hover { color: var(--cream); border-color: var(--muted); }
+
+    .hero-rule {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--border);
+    }
+
+    /* ── STATS BAND ── */
+    .stats-band {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .stat-item {
+      padding: 40px 48px;
+      border-right: 1px solid var(--border);
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: 44px;
+      color: var(--gold);
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+      line-height: 1.5;
+    }
+
+    /* ── SECTION LABELS ── */
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-bottom: 56px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how {
+      padding: 100px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+
+    .step {
+      padding: 0 48px 0 0;
+      border-right: 1px solid var(--border);
+    }
+
+    .step:last-child { border-right: none; padding-right: 0; padding-left: 48px; }
+    .step:nth-child(2) { padding-left: 48px; }
+
+    .step-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 24px;
+      display: block;
+    }
+
+    .step h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--cream);
+      margin-bottom: 16px;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .step p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    /* ── WHAT YOU GET ── */
+    .features {
+      padding: 100px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .feature {
+      background: var(--ink);
+      padding: 44px;
+      transition: background 0.2s;
+    }
+
+    .feature:hover { background: var(--surface); }
+
+    .feature-icon {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .feature-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--gold);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .feature h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--cream);
+      margin-bottom: 12px;
+    }
+
+    .feature p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    /* ── PULL QUOTE ── */
+    .quote-section {
+      padding: 100px 48px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    blockquote {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(24px, 3.5vw, 40px);
+      font-style: italic;
+      color: var(--cream);
+      line-height: 1.3;
+      letter-spacing: -0.5px;
+      max-width: 800px;
+      border-left: 2px solid var(--gold);
+      padding-left: 40px;
+    }
+
+    blockquote cite {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      font-style: normal;
+      color: var(--muted);
+      letter-spacing: 1px;
+      margin-top: 24px;
+    }
+
+    /* ── FOR BARBERS ── */
+    .for-barbers {
+      padding: 100px 48px;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .for-barbers-left h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 400;
+      color: var(--cream);
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 24px;
+    }
+
+    .for-barbers-left h2 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .for-barbers-left p {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .for-barbers-right {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid var(--border);
+    }
+
+    .barber-point {
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .barber-point:last-child { border-bottom: none; }
+
+    .barber-point-dash {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--gold);
+      padding-top: 3px;
+      flex-shrink: 0;
+    }
+
+    .barber-point-text {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .barber-point-text strong {
+      color: var(--cream);
+      font-weight: 500;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 100px 48px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+
+    .cta-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .cta-left h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 400;
+      color: var(--cream);
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .cta-left p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .cta-right { padding-top: 8px; }
+
+    .waitlist-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .waitlist-row {
+      display: flex;
+      gap: 0;
+    }
+
+    .waitlist-input {
+      flex: 1;
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      background: var(--ink);
+      border: 1px solid var(--border2);
+      border-right: none;
+      color: var(--cream);
+      padding: 14px 18px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .waitlist-input::placeholder { color: var(--muted2); }
+    .waitlist-input:focus { border-color: var(--gold); }
+
+    .waitlist-submit {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      padding: 14px 28px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .waitlist-submit:hover { background: var(--gold-dim); }
+    .waitlist-submit:disabled { background: var(--muted2); cursor: not-allowed; }
+
+    .waitlist-note {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted2);
+      letter-spacing: 0.5px;
+    }
+
+    .waitlist-success {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: #6db87a;
+      letter-spacing: 0.5px;
+      display: none;
+      padding: 14px 0;
+    }
+
+    .waitlist-error {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: #e07070;
+      letter-spacing: 0.5px;
+      display: none;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 32px 48px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px;
+      color: var(--cream);
+    }
+
+    .footer-logo span { color: var(--gold); }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--muted2);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--muted); }
+
+    .footer-copy {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted2);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      .nav-links { display: none; }
+      .hero { padding: 60px 24px; }
+      .stats-band { grid-template-columns: 1fr; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); padding: 32px 24px; }
+      .stat-item:last-child { border-bottom: none; }
+      .how { padding: 60px 24px; }
+      .steps { grid-template-columns: 1fr; gap: 40px; }
+      .step { border-right: none; padding: 0 !important; border-bottom: 1px solid var(--border); padding-bottom: 40px !important; }
+      .step:last-child { border-bottom: none; padding-bottom: 0 !important; }
+      .features { padding: 60px 24px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .quote-section { padding: 60px 24px; }
+      blockquote { padding-left: 24px; }
+      .for-barbers { padding: 60px 24px; grid-template-columns: 1fr; gap: 48px; }
+      .cta-section { padding: 60px 24px; }
+      .cta-inner { grid-template-columns: 1fr; gap: 40px; }
+      .waitlist-row { flex-direction: column; }
+      .waitlist-input { border-right: 1px solid var(--border2); }
+      footer { padding: 24px; flex-direction: column; align-items: flex-start; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">WalkIn<span>.</span></div>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#barbers">For barbers</a>
+    <a class="nav-cta" href="#early-access">Get early access</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">For walk-in barbers</div>
+  <h1>Your regulars<br>remember you.<br>We remind <em>them.</em></h1>
+  <p class="hero-sub">WalkIn. sends a timely SMS to your customers when they're due for their next cut. No app. No booking system. No change to how you work.</p>
+  <div class="hero-actions">
+    <a class="btn-gold" href="#early-access">Request early access</a>
+    <a class="btn-ghost" href="#how">See how it works</a>
+  </div>
+  <div class="hero-rule"></div>
+</section>
+
+<!-- STATS -->
+<div class="stats-band">
+  <div class="stat-item">
+    <div class="stat-num">18,400</div>
+    <div class="stat-label">Walk-in barbershops<br>in the UK</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">30 sec</div>
+    <div class="stat-label">For a customer<br>to register</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">Zero</div>
+    <div class="stat-label">Apps to download.<br>Accounts to create.</div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-label">How it works</div>
+  <div class="steps">
+    <div class="step">
+      <span class="step-num">01</span>
+      <h3>Customer scans your QR</h3>
+      <p>A QR code sits on your mirror or counter. After their cut, customers scan it and register in under 30 seconds. No app. No account to create.</p>
+    </div>
+    <div class="step">
+      <span class="step-num">02</span>
+      <h3>We track their cycle</h3>
+      <p>Every customer has their own haircut frequency. We track where they are in that cycle and know exactly when they're due — without you having to think about it.</p>
+    </div>
+    <div class="step">
+      <span class="step-num">03</span>
+      <h3>They get a reminder</h3>
+      <p>When they're due, we send a short personal SMS in your name. No marketing language. Just: you're due, your barber's in, walk in whenever you're ready.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-label">What you get</div>
+  <div class="features-grid">
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+      </div>
+      <h3>Automated reminders</h3>
+      <p>SMS reminders sent every morning to customers who are due, overdue, or lapsed. Completely automatic — no daily effort required from you.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <h3>Holiday-aware</h3>
+      <p>Going away? Add your dates to the dashboard. We'll pull reminders forward before you leave and let customers know when you're back.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      </div>
+      <h3>Barber dashboard</h3>
+      <p>See every registered customer, their reminder status, and last visit date. Clean, fast, works on any device. Log in from your phone between cuts.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <h3>Built-in opt-out</h3>
+      <p>Every message includes Reply STOP. Customers who opt out are removed instantly and permanently. Fully compliant with UK messaging regulations.</p>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote-section">
+  <blockquote>
+    "Customers are often loyal to the barber, not the shop. WalkIn. keeps that loyalty alive between visits."
+    <cite>— WalkIn. — walkindot.co.uk</cite>
+  </blockquote>
+</section>
+
+<!-- FOR BARBERS -->
+<section class="for-barbers" id="barbers">
+  <div class="for-barbers-left">
+    <div class="section-label">For barbers</div>
+    <h2>Built around<br>the <em>walk-in</em><br>model.</h2>
+    <p>Every other tool in the market is built for appointment-based shops. WalkIn. is different. It doesn't ask you to change how you work. It just fills the gap that every other tool ignores — staying connected with customers who never make a booking.</p>
+  </div>
+  <div class="for-barbers-right">
+    <div class="barber-point">
+      <span class="barber-point-dash">—</span>
+      <span class="barber-point-text"><strong>No change to your workflow.</strong> You cut hair. We handle the reminders. Nothing about your day needs to change.</span>
+    </div>
+    <div class="barber-point">
+      <span class="barber-point-dash">—</span>
+      <span class="barber-point-text"><strong>Messages feel personal.</strong> Every reminder uses the customer's name and your name. It reads like a message from you, not from a system.</span>
+    </div>
+    <div class="barber-point">
+      <span class="barber-point-dash">—</span>
+      <span class="barber-point-text"><strong>Not a booking app.</strong> Walk-in is a model, not a problem to fix. WalkIn. respects that.</span>
+    </div>
+    <div class="barber-point">
+      <span class="barber-point-dash">—</span>
+      <span class="barber-point-text"><strong>Works from day one.</strong> Print the QR poster, put it on your mirror, and the system starts working. That's it.</span>
+    </div>
+    <div class="barber-point">
+      <span class="barber-point-dash">—</span>
+      <span class="barber-point-text"><strong>No app for your customers.</strong> They scan, they fill in a short form, they're registered. Under 30 seconds.</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / WAITLIST -->
+<section class="cta-section" id="early-access">
+  <div class="cta-inner">
+    <div class="cta-left">
+      <div class="section-label">Early access</div>
+      <h2>Ready to keep your regulars coming back?</h2>
+      <p>WalkIn. is currently in early access. Leave your email and we'll be in touch when we're ready to bring you on board.</p>
+    </div>
+    <div class="cta-right">
+      <div class="waitlist-form">
+        <div class="waitlist-row">
+          <input class="waitlist-input" type="email" id="waitlist-email" placeholder="your@email.com" autocomplete="email">
+          <button class="waitlist-submit" id="waitlist-btn" onclick="submitWaitlist()">Request access</button>
+        </div>
+        <div class="waitlist-note">No commitment. No spam. We'll reach out when we're ready.</div>
+        <div class="waitlist-success" id="waitlist-success">✓ You're on the list. We'll be in touch.</div>
+        <div class="waitlist-error" id="waitlist-error">Something went wrong. Please try again or email hello@walkindot.co.uk</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">WalkIn<span>.</span></div>
+  <div class="footer-links">
+    <a href="/privacy.html">Privacy</a>
+    <a href="/terms.html">Terms</a>
+    <a href="mailto:hello@walkindot.co.uk">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 WalkIn Technologies Ltd</div>
+</footer>
+
+<script>
+  const WAITLIST_URL = 'https://script.google.com/macros/s/AKfycbzUc1-iiJuaci1lkd8ak3FVHPAmFJuhGOyWPfvH_A3EpPn7ofb8hpg_0zYLdzl0Tyzr9Q/exec';
+
+  async function submitWaitlist() {
+    const email = document.getElementById('waitlist-email').value.trim();
+    const btn = document.getElementById('waitlist-btn');
+    const success = document.getElementById('waitlist-success');
+    const error = document.getElementById('waitlist-error');
+
+    success.style.display = 'none';
+    error.style.display = 'none';
+
+    if (!email || !email.includes('@')) {
+      error.textContent = 'Please enter a valid email address.';
+      error.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    try {
+      await fetch(WAITLIST_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, source: 'Homepage' })
+      });
+
+      document.getElementById('waitlist-email').value = '';
+      document.getElementById('waitlist-row') && (document.getElementById('waitlist-row').style.display = 'none');
+      success.style.display = 'block';
+      btn.textContent = 'Done';
+
+    } catch(err) {
+      error.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Request access';
+    }
+  }
+
+  document.getElementById('waitlist-email').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') submitWaitlist();
+  });
+</script>
+
+</body>
+</html>
