@@ -53,17 +53,26 @@
 
   /* ── LAYOUT ─────────────────────────────────────────── */
   #app { display: none; }
-  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 2px solid var(--accent); background: var(--bg); position: sticky; top: 0; z-index: 100; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; border-bottom: 2px solid var(--accent); background: var(--bg); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; }
   .topbar-left { display: flex; align-items: center; gap: 14px; }
   .wordmark { display: flex; align-items: baseline; gap: 1px; }
   .wordmark-text { font-family: Georgia, serif; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
   .wordmark-dot  { font-family: Georgia, serif; font-size: 20px; font-weight: 700; color: var(--accent); }
   .founder-badge { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); background: var(--accent-glow); border: 1px solid rgba(201,168,76,0.25); padding: 3px 9px; border-radius: 4px; }
-  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .last-refresh { font-size: 10px; color: var(--muted); }
   .topbar-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; padding: 5px 12px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; }
   .topbar-btn:hover { border-color: var(--accent); color: var(--accent); }
   .topbar-btn.danger:hover { border-color: var(--red); color: var(--red); }
+
+  /* ── SHOP SELECTOR ──────────────────────────────────── */
+  .shop-selector { display: flex; align-items: center; gap: 5px; }
+  .shop-selector-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-right: 2px; white-space: nowrap; }
+  .shop-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; padding: 5px 11px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; white-space: nowrap; }
+  .shop-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .shop-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+  .topbar-divider { width: 1px; height: 18px; background: var(--border); margin: 0 2px; }
+
   .main { padding: 32px; max-width: 1300px; margin: 0 auto; }
 
   /* ── SECTION HEADERS ────────────────────────────────── */
@@ -216,7 +225,7 @@
   .flag-msg { font-size: 11px; color: var(--muted); line-height: 1.6; }
   .flag-msg strong { color: var(--text); }
 
-  /* ── INSIGHT BOX (left gold border style) ───────────── */
+  /* ── INSIGHT BOX ────────────────────────────────────── */
   .insight-bar { background: var(--surface); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 14px 18px; font-size: 0.85rem; line-height: 1.7; color: var(--text); }
   .insight-bar strong { color: var(--accent); }
 
@@ -250,6 +259,13 @@
       <div class="founder-badge">Founder</div>
     </div>
     <div class="topbar-right">
+      <div class="shop-selector">
+        <span class="shop-selector-label">View</span>
+        <button class="shop-btn active" id="shop-btn-all" onclick="setShop('all', this)">All Shops</button>
+        <button class="shop-btn" id="shop-btn-1" onclick="setShop(1, this)">Nicks Cuts</button>
+        <button class="shop-btn" id="shop-btn-2" onclick="setShop(2, this)">Shop 2</button>
+      </div>
+      <div class="topbar-divider"></div>
       <span class="last-refresh" id="last-refresh"></span>
       <button class="topbar-btn" onclick="loadAll()">↻ Refresh</button>
       <button class="topbar-btn danger" onclick="doLogout()">Sign out</button>
@@ -260,7 +276,7 @@
 
     <!-- ── PILOT SCORECARD ──────────────────────────────── -->
     <div class="section-header" style="margin-top:0">
-      <span class="section-title">Pilot Scorecard — Nicks Cuts Barbers</span>
+      <span class="section-title" id="scorecard-title">Pilot Scorecard — All Shops</span>
       <div class="section-rule"></div>
     </div>
     <div class="metrics-grid">
@@ -469,9 +485,16 @@
   const API_KEY = 'walkin-svc-2026-x9k3mq';
   const PASS    = 'founder1';
 
+  // Shop registry — update name and barber here when Shop 2 is confirmed
+  const SHOPS = {
+    1: { name: 'Nicks Cuts',  barber: 'Eren' },
+    2: { name: 'Shop 2',      barber: 'Barber 2' }
+  };
+
   let allCustomers = [];
   let allEvents    = [];
   let activeFilter = 'all';
+  let activeShop   = 'all'; // 'all', 1, or 2
 
   // ── AUTH ────────────────────────────────────────────────
   if (sessionStorage.getItem('wf') === '1') showApp();
@@ -492,6 +515,40 @@
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     loadAll();
+  }
+
+  // ── SHOP SELECTOR ───────────────────────────────────────
+  function setShop(shopId, btn) {
+    activeShop = shopId;
+    document.querySelectorAll('.shop-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Update scorecard title
+    const titleEl = document.getElementById('scorecard-title');
+    if (shopId === 'all') {
+      titleEl.textContent = 'Pilot Scorecard — All Shops';
+    } else {
+      titleEl.textContent = 'Pilot Scorecard — ' + (SHOPS[shopId] ? SHOPS[shopId].name : 'Shop ' + shopId);
+    }
+
+    // Re-render everything with filtered data — no new API calls needed
+    computeMetrics();
+    renderFeed();
+    renderTrend();
+    renderHealth();
+    renderTable();
+  }
+
+  // ── FILTERING HELPERS ───────────────────────────────────
+  function filteredCustomers() {
+    if (activeShop === 'all') return allCustomers;
+    return allCustomers.filter(c => c.shop_id === activeShop);
+  }
+
+  function filteredEvents() {
+    if (activeShop === 'all') return allEvents;
+    const shopCustomerIds = new Set(filteredCustomers().map(c => c.id));
+    return allEvents.filter(e => shopCustomerIds.has(e.customer_id));
   }
 
   // ── DATA LOAD ───────────────────────────────────────────
@@ -533,14 +590,17 @@
 
   // ── METRICS ─────────────────────────────────────────────
   function computeMetrics() {
-    const total    = allCustomers.length;
-    const lapsed   = allCustomers.filter(c => !c.opted_out && c.reminder_state === 'lapsed').length;
-    const optedOut = allCustomers.filter(c => c.opted_out).length;
-    const active   = total - lapsed - optedOut;
-    const smsSent  = allEvents.filter(e => e.event_type === 'sms_sent').length;
+    const customers = filteredCustomers();
+    const events    = filteredEvents();
 
-    // Pilot age
-    const regTimes = allEvents.filter(e => e.event_type === 'registered').map(e => e.created_at).sort();
+    const total    = customers.length;
+    const lapsed   = customers.filter(c => !c.opted_out && c.reminder_state === 'lapsed').length;
+    const optedOut = customers.filter(c => c.opted_out).length;
+    const active   = total - lapsed - optedOut;
+    const smsSent  = events.filter(e => e.event_type === 'sms_sent').length;
+
+    // Pilot age — first registration in the filtered set
+    const regTimes = events.filter(e => e.event_type === 'registered').map(e => e.created_at).sort();
     const pilotDays = regTimes.length > 0 ? Math.floor((Date.now() - regTimes[0]) / 86400000) : 0;
 
     const optRate = total > 0 ? Math.round((optedOut / total) * 100) : 0;
@@ -560,17 +620,20 @@
 
     // State distribution
     ['not_due','due_soon','due','overdue','lapsed','reminded'].forEach(s => {
-      const n = allCustomers.filter(c => !c.opted_out && c.reminder_state === s).length;
+      const n = customers.filter(c => !c.opted_out && c.reminder_state === s).length;
       set('st-' + s, n);
     });
     set('st-opted_out', optedOut);
 
-    // Lapsed alert
+    // Lapsed alert — personalise barber name per shop
     const lAlert = document.getElementById('lapsed-alert');
     if (lapsed > 0) {
-      const names = allCustomers.filter(c => !c.opted_out && c.reminder_state === 'lapsed').map(c => c.first_name).join(', ');
+      const names = customers.filter(c => !c.opted_out && c.reminder_state === 'lapsed').map(c => c.first_name).join(', ');
+      let barberRef = 'the barber';
+      if (activeShop !== 'all' && SHOPS[activeShop]) barberRef = SHOPS[activeShop].barber;
+      else if (activeShop === 'all') barberRef = 'their barber';
       document.getElementById('lapsed-text').innerHTML =
-        `<strong>${lapsed} customer${lapsed > 1 ? 's' : ''} lapsed</strong> — ${names}. These customers haven't returned after receiving all reminders. Consider a direct word from Eren.`;
+        `<strong>${lapsed} customer${lapsed > 1 ? 's' : ''} lapsed</strong> — ${names}. These customers haven't returned after receiving all reminders. Consider a direct word from ${barberRef}.`;
       lAlert.classList.add('show');
     } else {
       lAlert.classList.remove('show');
@@ -581,8 +644,12 @@
     renderFlags();
   }
 
+  // ── DRIFT ANALYSIS ──────────────────────────────────────
   function computeDrift() {
-    const withFreq = allCustomers.filter(c => !c.opted_out && c.haircut_frequency_weeks > 0);
+    const customers = filteredCustomers();
+    const events    = filteredEvents();
+
+    const withFreq = customers.filter(c => !c.opted_out && c.haircut_frequency_weeks > 0);
     if (!withFreq.length) {
       set('d-stated', '—');
       set('d-actual', '—');
@@ -592,7 +659,7 @@
     const avgStated = withFreq.reduce((sum, c) => sum + c.haircut_frequency_weeks, 0) / withFreq.length;
 
     const visitsByCustomer = {};
-    allEvents
+    events
       .filter(e => e.event_type === 'visit')
       .forEach(e => {
         if (!visitsByCustomer[e.customer_id]) visitsByCustomer[e.customer_id] = [];
@@ -616,7 +683,7 @@
       return;
     }
 
-    const avgActualDays = customerGaps.reduce((a, b) => a + b, 0) / customerGaps.length;
+    const avgActualDays  = customerGaps.reduce((a, b) => a + b, 0) / customerGaps.length;
     const avgActualWeeks = avgActualDays / 7;
     const gap = avgActualWeeks - avgStated;
 
@@ -628,9 +695,11 @@
     gapEl.className = 'drift-value ' + (gap <= 0 ? 'col-green' : gap < 1 ? 'col-orange' : 'col-red');
   }
 
+  // ── CONVERSION ──────────────────────────────────────────
   function computeConversion() {
+    const events = filteredEvents();
     const byId = {};
-    allEvents.forEach(e => {
+    events.forEach(e => {
       if (!byId[e.customer_id]) byId[e.customer_id] = [];
       byId[e.customer_id].push(e);
     });
@@ -651,7 +720,7 @@
       }
     });
 
-    const driven = allEvents.filter(e => e.event_type === 'visit' && e.visit_was_reminder_driven === true).length;
+    const driven = events.filter(e => e.event_type === 'visit' && e.visit_was_reminder_driven === true).length;
 
     set('c-rate',   reminded > 0 ? Math.round((returned / reminded) * 100) + '%' : '—');
     set('c-days',   daysArr.length > 0 ? Math.round(daysArr.reduce((a,b) => a+b,0) / daysArr.length) + 'd' : '—');
@@ -660,7 +729,7 @@
 
   // ── TREND ───────────────────────────────────────────────
   function renderTrend() {
-    const regs = allEvents.filter(e => e.event_type === 'registered');
+    const regs = filteredEvents().filter(e => e.event_type === 'registered');
     const now  = Date.now();
     const buckets = [];
 
@@ -682,7 +751,7 @@
     }).join('');
   }
 
-  // ── HEALTH ──────────────────────────────────────────────
+  // ── HEALTH — always global, infrastructure monitoring ───
   function renderHealth() {
     if (!allEvents.length) {
       set('h-event',     'No events yet');
@@ -715,7 +784,8 @@
   }
 
   function renderFeed() {
-    const filtered = activeFilter === 'all' ? allEvents : allEvents.filter(e => e.event_type === activeFilter);
+    const events   = filteredEvents();
+    const filtered = activeFilter === 'all' ? events : events.filter(e => e.event_type === activeFilter);
     const el = document.getElementById('feed-list');
     if (!filtered.length) { el.innerHTML = '<div class="panel-empty">No events yet.</div>'; return; }
     el.innerHTML = filtered.slice(0, 120).map(e => `
@@ -729,7 +799,7 @@
       </div>`).join('');
   }
 
-  // ── JOURNEY ─────────────────────────────────────────────
+  // ── JOURNEY — always uses full allEvents for the individual customer
   function showJourney(customerId, name) {
     document.getElementById('journey-name').textContent = name || 'Customer #' + customerId;
     const evs = allEvents.filter(e => e.customer_id === customerId).sort((a,b) => a.created_at - b.created_at);
@@ -753,12 +823,13 @@
     document.getElementById('tbl-loading').style.display = 'none';
     const tbl = document.getElementById('customers-table');
     tbl.style.display = 'table';
-    if (!allCustomers.length) {
+    const customers = filteredCustomers();
+    if (!customers.length) {
       document.getElementById('customers-tbody').innerHTML =
         '<tr><td colspan="7" class="dim">No customers registered yet.</td></tr>';
       return;
     }
-    document.getElementById('customers-tbody').innerHTML = allCustomers.map(c => {
+    document.getElementById('customers-tbody').innerHTML = customers.map(c => {
       const state = c.opted_out ? 'opted_out' : (c.reminder_state || 'not_due');
       const lv    = c.last_visit_at
         ? new Date(c.last_visit_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
@@ -780,9 +851,11 @@
 
   // ── CONCERN FLAGS ────────────────────────────────────────
   function renderFlags() {
+    const customers = filteredCustomers();
+    const events    = filteredEvents();
     const flags = [];
     const byId  = {};
-    allEvents.forEach(e => {
+    events.forEach(e => {
       if (!byId[e.customer_id]) byId[e.customer_id] = [];
       byId[e.customer_id].push(e);
     });
@@ -799,7 +872,7 @@
       }
     });
 
-    allCustomers.filter(c => c.opted_out).forEach(c => {
+    customers.filter(c => c.opted_out).forEach(c => {
       const evs   = (byId[c.id] || []);
       const smsEv = evs.find(e => e.event_type === 'sms_sent');
       const optEv = evs.find(e => e.event_type === 'opted_out');
