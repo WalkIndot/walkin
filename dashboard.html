@@ -169,7 +169,6 @@
   .how-item { display: flex; gap: 10px; align-items: flex-start; font-size: 11px; color: var(--muted); line-height: 1.6; }
   .how-item::before { content: '—'; color: var(--accent); flex-shrink: 0; }
 
-
   /* ── SORTABLE HEADERS ────────────────────────────────── */
   thead th.sortable { cursor: pointer; user-select: none; }
   thead th.sortable:hover { color: var(--text); }
@@ -361,14 +360,14 @@
 
 <script>
   const BASE    = 'https://x8ki-letl-twmt.n7.xano.io/api:3BaFz8Nm';
-  const BARBERS = { 1: 'Eren' };
+  const BARBERS = { 1: 'Eren', 2: 'Kiran' };
   const API_KEY = 'walkin-svc-2026-x9k3mq';
   let authToken = sessionStorage.getItem('walkin_token') || null;
   let barberId  = parseInt(sessionStorage.getItem('walkin_barber_id')) || null;
   let shopId    = parseInt(sessionStorage.getItem('walkin_shop_id')) || null;
   let allCustomers = [];
   let sortCol  = 'last_visit';
-  let sortDir  = 'desc'; // newest first by default
+  let sortDir  = 'desc';
 
   const STATE_ORDER = { overdue:0, due:1, due_soon:2, lapsed:3, reminded:4, not_due:5, opted_out:6 };
 
@@ -422,7 +421,7 @@
 
   function showDashboard() {
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('dashboard').style.display   = 'block';
+    document.getElementById('dashboard').style.display = 'block';
     const name = sessionStorage.getItem('walkin_barber_name') || '';
     if (name) document.getElementById('topbar-name').textContent = name;
     loadCustomers();
@@ -431,9 +430,17 @@
   }
 
   // ── CUSTOMERS ─────────────────────────────────────────
+  // X2b: now calls /customer/by_shop scoped to this barber's shop
   async function loadCustomers() {
+    if (!shopId) {
+      document.getElementById('customers-loading').innerHTML =
+        '<span style="color:var(--red)">Session error — please sign out and sign back in.</span>';
+      return;
+    }
     try {
-      const res = await fetch(BASE + '/customer/all', { headers: { 'X-Api-Key': API_KEY } });
+      const res = await fetch(BASE + '/customer/by_shop?shop_id=' + shopId, {
+        headers: { 'X-Api-Key': API_KEY }
+      });
       if (res.status === 401) { doLogout(); return; }
       const customers = await res.json();
       document.getElementById('customers-loading').style.display = 'none';
@@ -458,14 +465,9 @@
       sortCol = col;
       sortDir = col === 'last_visit' ? 'desc' : 'asc';
     }
-    // Update header arrows
     document.querySelectorAll('thead th.sortable').forEach(th => {
       th.classList.remove('sort-asc', 'sort-desc');
     });
-    const colMap = { name: 0, frequency: 2, last_visit: 3, state: 4 };
-    const thIndex = colMap[col];
-    const ths = document.querySelectorAll('thead th.sortable');
-    // Find the right th by onclick attribute
     document.querySelectorAll('thead th.sortable').forEach(th => {
       if (th.getAttribute('onclick') === "sortBy('" + col + "')") {
         th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
@@ -475,8 +477,8 @@
   }
 
   function getSortValue(c, col) {
-    if (col === 'name')      return (c.first_name || '').toLowerCase();
-    if (col === 'frequency') return c.haircut_frequency_weeks || 99;
+    if (col === 'name')       return (c.first_name || '').toLowerCase();
+    if (col === 'frequency')  return c.haircut_frequency_weeks || 99;
     if (col === 'last_visit') return c.last_visit_at || 0;
     if (col === 'state') {
       const s = c.opted_out ? 'opted_out' : (c.reminder_state || 'not_due');
@@ -501,7 +503,6 @@
         const state      = c.opted_out ? 'opted_out' : (c.reminder_state || 'not_due');
         const stateLabel = state.replace('_', ' ');
         const hasNotes   = c.notes && c.notes.trim().length > 0;
-        
         return `<tr>
           <td>${esc(c.first_name || '—')}</td>
           <td class="td-muted col-phone">${esc(c.phone || '—')}</td>
@@ -545,7 +546,6 @@
         body: JSON.stringify({ phone, shop_id: shopId, barber_id: barberId })
       });
       if (!res.ok) throw new Error();
-      // Log the event
       fetch(BASE + '/customer/log_event', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -557,7 +557,6 @@
         })
       }).catch(() => {});
       if (btn) { btn.textContent = 'done ✓'; btn.style.color = 'var(--green)'; }
-      // Refresh table after short delay so barber sees confirmation first
       setTimeout(() => loadCustomers(), 1500);
     } catch(e) {
       if (btn) { btn.disabled = false; btn.textContent = 'log visit'; }
