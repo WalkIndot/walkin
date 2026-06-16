@@ -263,7 +263,7 @@
         <span class="shop-selector-label">View</span>
         <button class="shop-btn active" id="shop-btn-all" onclick="setShop('all', this)">All Shops</button>
         <button class="shop-btn" id="shop-btn-1" onclick="setShop(1, this)">Nicks Cuts</button>
-        <button class="shop-btn" id="shop-btn-2" onclick="setShop(2, this)">Shop 2</button>
+        <button class="shop-btn" id="shop-btn-2" onclick="setShop(2, this)">Top Cut Barbers</button>
       </div>
       <div class="topbar-divider"></div>
       <span class="last-refresh" id="last-refresh"></span>
@@ -331,7 +331,7 @@
       <div class="drift-card">
         <div class="drift-label">Drift Gap</div>
         <div class="drift-value col-red" id="d-gap">—</div>
-        <div class="drift-desc">The difference between stated and actual. This is the problem WalkIn. solves — measured with Eren's own customers.</div>
+        <div class="drift-desc">The difference between stated and actual. This is the problem WalkIn. solves — measured with real pilot data.</div>
       </div>
     </div>
 
@@ -488,7 +488,7 @@
   // Shop registry — update name and barber here when Shop 2 is confirmed
   const SHOPS = {
     1: { name: 'Nicks Cuts',  barber: 'Eren' },
-    2: { name: 'Shop 2',      barber: 'Barber 2' }
+    2: { name: 'Top Cut Barbers',      barber: 'Kiran' }
   };
 
   let allCustomers = [];
